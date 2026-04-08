@@ -1,11 +1,3 @@
-/**
- * InventoryValue.java
- *
- * Immutable record representing the calculated total value of a user's CS2 skin portfolio.
- * Returned by the /api/inventory/{steamId}/value endpoint.
- *
- * @author Ville Laaksoaho
- */
 package com.cstracker.model;
 
 import java.util.List;
@@ -16,11 +8,11 @@ import java.util.List;
  * @param steamId       the 64-bit Steam ID of the portfolio owner
  * @param itemCount     total number of CS2 items in the inventory
  * @param totalValueUsd estimated total market value of all items in USD
- * @param items         the full list of individual SteamItem records
+ * @param items         the full list of priced items
  */
 public record InventoryValue(
         String steamId,
         int itemCount,
         double totalValueUsd,
-        List<SteamItem> items
+        List<PricedItem> items
 ) {}

@@ -8,7 +8,9 @@
 package com.cstracker.controller;
 
 import com.cstracker.model.InventoryValue;
+import com.cstracker.model.PricedItem;
 import com.cstracker.model.SteamItem;
+import com.cstracker.service.PriceService;
 import com.cstracker.service.SteamApiService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,18 +24,21 @@ import java.util.List;
 public class InventoryController {
 
     private final SteamApiService steamApiService;
+    private final PriceService priceService;
 
     /**
-     * Constructs the controller with the required Steam API service dependency.
+     * Constructs the controller with required service dependencies.
      *
      * @param steamApiService service used to fetch CS2 inventory data from Steam
+     * @param priceService    service used to fetch Steam Market prices
      */
-    public InventoryController(SteamApiService steamApiService) {
+    public InventoryController(SteamApiService steamApiService, PriceService priceService) {
         this.steamApiService = steamApiService;
+        this.priceService = priceService;
     }
 
     /**
-     * Returns all CS2 items in the given user's Steam inventory.
+     * Returns all CS2 items in the given user's Steam inventory without prices.
      * GET /api/inventory/{steamId}
      *
      * @param steamId the 64-bit Steam ID of the target user
@@ -45,17 +50,17 @@ public class InventoryController {
     }
 
     /**
-     * Returns the total estimated portfolio value with item breakdown.
+     * Returns the total portfolio value with per-item Steam Market prices.
      * GET /api/inventory/{steamId}/value
      *
      * @param steamId the 64-bit Steam ID of the target user
-     * @return InventoryValue containing item count, total USD value, and item list
+     * @return InventoryValue with item count, total USD value, and priced item list
      */
     @GetMapping("/{steamId}/value")
     public InventoryValue getInventoryValue(@PathVariable String steamId) {
         List<SteamItem> items = steamApiService.getInventory(steamId);
-        // TODO: replace with real prices from a CS2 price API
-        double totalValueUsd = items.size() * 50.0;
-        return new InventoryValue(steamId, items.size(), totalValueUsd, items);
+        List<PricedItem> pricedItems = priceService.addPrices(items);
+        double totalValueUsd = pricedItems.stream().mapToDouble(PricedItem::totalValueUsd).sum();
+        return new InventoryValue(steamId, items.size(), totalValueUsd, pricedItems);
     }
 }
