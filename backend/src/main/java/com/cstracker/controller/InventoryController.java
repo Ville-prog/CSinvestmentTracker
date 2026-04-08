@@ -2,7 +2,6 @@
  * InventoryController.java
  *
  * REST controller exposing CS2 inventory and portfolio value endpoints.
- * All routes are prefixed with /api/inventory and identified by a Steam ID path variable.
  *
  * @author Ville Laaksoaho
  */
@@ -38,7 +37,7 @@ public class InventoryController {
      * GET /api/inventory/{steamId}
      *
      * @param steamId the 64-bit Steam ID of the target user
-     * @return list of SteamItem records representing the user's CS2 skins
+     * @return list of SteamItem records
      */
     @GetMapping("/{steamId}")
     public List<SteamItem> getInventory(@PathVariable String steamId) {
@@ -46,19 +45,17 @@ public class InventoryController {
     }
 
     /**
-     * Returns the total estimated portfolio value along with the full item breakdown.
+     * Returns the total estimated portfolio value with item breakdown.
      * GET /api/inventory/{steamId}/value
      *
      * @param steamId the 64-bit Steam ID of the target user
-     * @return an InventoryValue containing the item count, total USD value, and item list
+     * @return InventoryValue containing item count, total USD value, and item list
      */
     @GetMapping("/{steamId}/value")
     public InventoryValue getInventoryValue(@PathVariable String steamId) {
         List<SteamItem> items = steamApiService.getInventory(steamId);
-
-        // TODO: Fetch real prices from a CS2 price API (e.g. Steam Market, CSFloat, Skinport)
+        // TODO: replace with real prices from a CS2 price API
         double totalValueUsd = items.size() * 50.0;
-
         return new InventoryValue(steamId, items.size(), totalValueUsd, items);
     }
 }
