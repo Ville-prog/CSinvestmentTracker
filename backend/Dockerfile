@@ -3,7 +3,7 @@ WORKDIR /app
 COPY .mvn .mvn
 COPY mvnw .
 COPY pom.xml .
-RUN chmod +x mvnw && ./mvnw dependency:go-offline
+RUN apk add --no-cache curl && chmod +x mvnw && ./mvnw dependency:go-offline
 COPY src src
 RUN ./mvnw package -DskipTests
 
