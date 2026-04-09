@@ -30,7 +30,7 @@ public class MarketDataService {
 
     private static final Logger log = LoggerFactory.getLogger(MarketDataService.class);
     private static final String YAHOO_URL =
-            "https://query1.finance.yahoo.com/v8/finance/chart/%%5EGSPC?interval=1d&period1=%d&period2=%d";
+            "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1d&period1=%d&period2=%d";
 
     private final RestTemplate restTemplate;
 
