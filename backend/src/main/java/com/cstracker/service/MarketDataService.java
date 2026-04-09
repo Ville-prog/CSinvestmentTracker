@@ -16,7 +16,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
+
+import java.net.URI;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -63,7 +64,7 @@ public class MarketDataService {
             headers.set("Accept", "application/json");
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<Map> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            ResponseEntity<Map> responseEntity = restTemplate.exchange(URI.create(url), HttpMethod.GET, entity, Map.class);
             Map response = responseEntity.getBody();
             Map chart = (Map) response.get("chart");
             List resultList = (List) chart.get("result");
