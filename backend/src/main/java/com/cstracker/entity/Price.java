@@ -31,7 +31,7 @@ public class Price {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Column(name = "price_usd", nullable = false)
+    @Column(name = "price_eur", nullable = false)
     private double priceEur;
 
     /** @return the auto-generated database primary key */

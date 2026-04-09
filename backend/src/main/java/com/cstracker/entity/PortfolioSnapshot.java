@@ -26,7 +26,7 @@ public class PortfolioSnapshot {
     @Column(nullable = false, unique = true)
     private LocalDate date;
 
-    @Column(name = "total_value_usd", nullable = false)
+    @Column(name = "total_value_eur", nullable = false)
     private double totalValueEur;
 
     @Column(name = "item_count", nullable = false)
