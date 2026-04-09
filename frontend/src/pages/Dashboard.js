@@ -5,10 +5,11 @@
  * Fetches the most recent snapshot from the backend on mount and passes it to child components.
  *
  * @author Ville Laaksoaho
- * Dependencies: PortfolioChart.js, Dashboard.css
+ * Dependencies: PortfolioChart.js, PortfolioValueChart.js, Dashboard.css
  */
 import { useEffect, useState } from 'react';
 import PortfolioChart from '../components/PortfolioChart';
+import PortfolioValueChart from '../components/PortfolioValueChart';
 import './Dashboard.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
@@ -22,6 +23,7 @@ function Dashboard() {
   const [snapshot, setSnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [chartView, setChartView] = useState('performance');
 
   useEffect(() => {
     fetch(`${API_BASE}/api/portfolio/latest`)
@@ -54,12 +56,27 @@ function Dashboard() {
           <span className="stat-value">€{snapshot.totalValueEur.toFixed(2)}</span>
         </div>
         <div className="stat-card">
-          <span className="stat-label">Items Tracked</span>
+          <span className="stat-label">Items in Inventory</span>
           <span className="stat-value">{snapshot.itemCount}</span>
         </div>
       </div>
 
-      <PortfolioChart />
+      <div className="chart-tabs">
+        <button
+          className={`chart-tab ${chartView === 'performance' ? 'active' : ''}`}
+          onClick={() => setChartView('performance')}
+        >
+          P&L %
+        </button>
+        <button
+          className={`chart-tab ${chartView === 'value' ? 'active' : ''}`}
+          onClick={() => setChartView('value')}
+        >
+          Total Value
+        </button>
+      </div>
+
+      {chartView === 'performance' ? <PortfolioChart /> : <PortfolioValueChart />}
     </div>
   );
 }

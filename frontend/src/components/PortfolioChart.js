@@ -23,19 +23,24 @@ const RANGES = [
   { label: '6M', months: 6 },
   { label: '3M', months: 3 },
   { label: '1M', months: 1 },
+  { label: '1W', weeks: 1 },
 ];
 
 /**
- * @brief Returns an ISO date string for the start of a range given a number of months back.
- *        Returns the CS:GO skin market launch date when months is null (Max range).
+ * @brief Returns an ISO date string for the start of the given range.
+ *        Supports month-based and week-based ranges. Returns the CS:GO skin market launch date for Max.
  *
- * @param {number|null} months Number of months to go back, or null for Max
+ * @param {{ months: number|null, weeks?: number }} range Range object from the RANGES array
  * @returns {string} ISO date string (YYYY-MM-DD)
  */
-function fromDate(months) {
-  if (months === null) return '2013-08-13';
+function fromDate(range) {
+  if (range.months === null) return '2013-08-13';
   const d = new Date();
-  d.setMonth(d.getMonth() - months);
+  if (range.weeks) {
+    d.setDate(d.getDate() - range.weeks * 7);
+  } else {
+    d.setMonth(d.getMonth() - range.months);
+  }
   return d.toISOString().split('T')[0];
 }
 
@@ -76,11 +81,12 @@ function formatDate(dateStr) {
 function PortfolioChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [range, setRange] = useState('1Y');
+  const [range, setRange] = useState('1W');
+  const [showSp500, setShowSp500] = useState(true);
 
   useEffect(() => {
     const selectedRange = RANGES.find(r => r.label === range);
-    const rangeFrom = fromDate(selectedRange.months);
+    const rangeFrom = fromDate(selectedRange);
 
     setLoading(true);
 
@@ -128,16 +134,24 @@ function PortfolioChart() {
 
   return (
     <div className="chart-wrapper">
-      <div className="chart-range-buttons">
-        {RANGES.map(r => (
-          <button
-            key={r.label}
-            className={`range-btn ${range === r.label ? 'active' : ''}`}
-            onClick={() => setRange(r.label)}
-          >
-            {r.label}
-          </button>
-        ))}
+      <div className="chart-controls">
+        <div className="chart-range-buttons">
+          {RANGES.map(r => (
+            <button
+              key={r.label}
+              className={`range-btn ${range === r.label ? 'active' : ''}`}
+              onClick={() => setRange(r.label)}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
+        <button
+          className={`range-btn ${showSp500 ? 'active' : ''}`}
+          onClick={() => setShowSp500(v => !v)}
+        >
+          S&P 500
+        </button>
       </div>
 
       {loading ? (
@@ -176,7 +190,7 @@ function PortfolioChart() {
               wrapperStyle={{ fontSize: 13, color: '#888' }}
             />
             <ReferenceLine y={0} stroke="#333" strokeDasharray="3 3" />
-            <Line type="monotone" dataKey="sp500" stroke="#f0c040" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
+            {showSp500 && <Line type="monotone" dataKey="sp500" stroke="#f0c040" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />}
             <Line type="monotone" dataKey="portfolio" stroke="#4f9eff" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
           </LineChart>
         </ResponsiveContainer>

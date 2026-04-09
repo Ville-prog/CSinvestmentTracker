@@ -1,7 +1,13 @@
+.chart-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .chart-range-buttons {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
 }
 
 .range-btn {

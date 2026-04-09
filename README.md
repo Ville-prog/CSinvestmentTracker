@@ -29,19 +29,23 @@ tbd
 
 A nightly job runs at 2 AM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time. A portfolio snapshot (total value + item count) is also saved each night.
 
-## Portfolio vs S&P 500 comparison
+## Charts
 
-The chart compares CS2 portfolio performance against the S&P 500 using **two different calculations:**
+The dashboard has two chart views, selectable via tabs:
 
-**S&P 500:** Normalized to percentage change from the date the first steam inventory portfolio snapshot was recorded. This represents what a comparable investment in the index would have returned since tracking began.
+### P&L %
 
-**CS2 Portfolio:** Shown as profit/loss percentage relative to cost basis:
+Shows CS2 portfolio profit/loss as a percentage compared against the S&P 500. The S&P 500 line can be toggled on or off. CS2 Portfolio is calculated as profit/loss relative to cost basis:
 
 ```
 P&L % = (current value - cost basis) / cost basis * 100
 ```
 
-Cost basis is tracked per item and recorded at the market price on the day the item first becomes marketable (either on first inventory scan, or when a trade cooldown expires). When more units of the same item are added later, the additional units are recorded at that day's price, building up the cost basis incrementally. **This means the portfolio line only moves when prices change, not when new items are added to the inventory.**
+Cost basis is recorded at the market price on the day each item first becomes marketable, either on the first inventory scan or when a trade cooldown expires. When more units of the same item are added later, they are recorded at that day's price, incrementally building the cost basis. **This means the portfolio line only moves when prices change, not when new items are added to the inventory.**
+
+### Total Value
+
+Shows raw portfolio value in EUR over time. Unlike the P&L chart, this reflects absolute value including the effect of adding new items to the inventory.
 
 ## Steam API limitations
 
