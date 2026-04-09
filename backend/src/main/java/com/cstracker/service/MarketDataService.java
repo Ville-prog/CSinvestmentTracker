@@ -10,8 +10,13 @@ package com.cstracker.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.core.ParameterizedTypeReference;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -53,7 +58,13 @@ public class MarketDataService {
         List<Map<String, Object>> result = new ArrayList<>();
 
         try {
-            Map response = restTemplate.getForObject(url, Map.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36");
+            headers.set("Accept", "application/json");
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+            ResponseEntity<Map> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
+            Map response = responseEntity.getBody();
             Map chart = (Map) response.get("chart");
             List resultList = (List) chart.get("result");
             if (resultList == null || resultList.isEmpty()) return result;
