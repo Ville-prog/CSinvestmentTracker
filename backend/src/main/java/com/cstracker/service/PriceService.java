@@ -2,7 +2,7 @@
  * PriceService.java
  *
  * Fetches CS2 item prices from the Steam Community Market price overview API.
- * Returns median prices in USD. Items with no price data return 0.0.
+ * Returns median prices in EUR. Items with no price data return 0.0.
  *
  * @author Ville Laaksoaho
  */
@@ -25,9 +25,9 @@ public class PriceService {
 
     private static final Logger log = LoggerFactory.getLogger(PriceService.class);
 
-    // currency=1 = USD
+    // currency=3 = EUR
     private static final String PRICE_URL =
-            "https://steamcommunity.com/market/priceoverview/?appid=730&currency=1&market_hash_name=%s";
+            "https://steamcommunity.com/market/priceoverview/?appid=730&currency=3&market_hash_name=%s";
 
     private final RestTemplate restTemplate;
 
@@ -42,7 +42,7 @@ public class PriceService {
 
     /**
      * Enriches a list of SteamItems with current Steam Market median prices.
-     * Items that are not marketable or have no price data are returned with priceUsd=0.
+     * Items that are not marketable or have no price data are returned with priceEur=0.
      *
      * @param items list of SteamItem records from the inventory
      * @return list of PricedItem records with price and total value fields populated
@@ -67,11 +67,11 @@ public class PriceService {
     }
 
     /**
-     * Fetches the Steam Market median price in USD for a single item.
+     * Fetches the Steam Market median price in EUR for a single item.
      * Returns 0.0 if the request fails or the item has no price data.
      *
      * @param marketHashName the full market name of the item including wear
-     * @return median price in USD, or 0.0 on failure
+     * @return median price in EUR, or 0.0 on failure
      */
     double fetchPrice(String marketHashName) {
         try {
@@ -94,7 +94,8 @@ public class PriceService {
     }
 
     /**
-     * Parses a Steam Market price string (e.g. "$1,234.56") into a double.
+     * Parses a Steam Market price string in EUR format (e.g. "1.234,56€") into a double.
+     * Handles European comma-as-decimal and period-as-thousands-separator formatting.
      *
      * @param priceStr price string from the Steam Market API
      * @return parsed price as a double, or 0.0 if parsing fails
@@ -102,7 +103,11 @@ public class PriceService {
     private double parsePrice(String priceStr) {
         if (priceStr == null || priceStr.isBlank()) return 0.0;
         try {
-            return Double.parseDouble(priceStr.replaceAll("[^0-9.]", ""));
+            String cleaned = priceStr
+                    .replaceAll("[€$\\s]", "")
+                    .replace(".", "")
+                    .replace(",", ".");
+            return Double.parseDouble(cleaned);
         } catch (NumberFormatException e) {
             log.warn("Could not parse price string: '{}'", priceStr);
             return 0.0;

@@ -80,32 +80,50 @@ function PortfolioChart() {
 
   useEffect(() => {
     const selectedRange = RANGES.find(r => r.label === range);
-    const from = fromDate(selectedRange.months);
+    const rangeFrom = fromDate(selectedRange.months);
 
     setLoading(true);
 
-    Promise.all([
-      fetch(`${API_BASE}/api/portfolio/history`).then(r => r.json()),
-      fetch(`${API_BASE}/api/market/sp500?from=${from}`).then(r => r.json())
-    ]).then(([history, sp500]) => {
-      const normSp500 = normalize(sp500.map(p => ({ date: p.date, value: p.close })), 'value');
-      const sp500Map = Object.fromEntries(normSp500.map(p => [p.date, p.pct]));
+    fetch(`${API_BASE}/api/portfolio/history`)
+      .then(r => r.json())
+      .then(history => {
+        if (!history || history.length === 0) {
+          setData([]);
+          setLoading(false);
+          return;
+        }
 
-      const filteredHistory = history.filter(h => h.date >= from);
-      const normPortfolio = normalize(
-        filteredHistory.map(h => ({ date: h.date, value: h.totalValueUsd })), 'value'
-      );
-      const portfolioMap = Object.fromEntries(normPortfolio.map(p => [p.date, p.pct]));
+        const firstSnapshotDate = history[0].date;
+        const sp500From = firstSnapshotDate > rangeFrom ? firstSnapshotDate : rangeFrom;
 
-      const merged = normSp500.map(p => ({
-        date: p.date,
-        sp500: sp500Map[p.date] ?? null,
-        portfolio: portfolioMap[p.date] ?? null
-      }));
+        fetch(`${API_BASE}/api/market/sp500?from=${firstSnapshotDate}`)
+          .then(r => r.json())
+          .then(sp500 => {
+            const normSp500 = normalize(sp500.map(p => ({ date: p.date, value: p.close })), 'value');
+            const sp500Map = Object.fromEntries(normSp500.map(p => [p.date, p.pct]));
 
-      setData(merged);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+            const portfolioMap = Object.fromEntries(
+              history.map(h => {
+                const pnl = h.totalCostBasisEur > 0
+                  ? parseFloat((((h.totalValueEur - h.totalCostBasisEur) / h.totalCostBasisEur) * 100).toFixed(2))
+                  : 0;
+                return [h.date, pnl];
+              })
+            );
+
+            const merged = normSp500
+              .filter(p => p.date >= sp500From)
+              .map(p => ({
+                date: p.date,
+                sp500: sp500Map[p.date] ?? null,
+                portfolio: portfolioMap[p.date] ?? null
+              }));
+
+            setData(merged);
+            setLoading(false);
+          });
+      })
+      .catch(() => setLoading(false));
   }, [range]);
 
   return (
@@ -147,14 +165,14 @@ function PortfolioChart() {
             <Tooltip
               formatter={(value, name) => [
                 value != null ? `${value > 0 ? '+' : ''}${value}%` : 'N/A',
-                name === 'portfolio' ? 'CS2 Portfolio' : 'S&P 500'
+                name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'
               ]}
               labelFormatter={formatDate}
               contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6 }}
               labelStyle={{ color: '#888' }}
             />
             <Legend
-              formatter={name => name === 'portfolio' ? 'CS2 Portfolio' : 'S&P 500'}
+              formatter={name => name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'}
               wrapperStyle={{ fontSize: 13, color: '#888' }}
             />
             <ReferenceLine y={0} stroke="#333" strokeDasharray="3 3" />

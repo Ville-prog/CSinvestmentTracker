@@ -27,10 +27,13 @@ public class PortfolioSnapshot {
     private LocalDate date;
 
     @Column(name = "total_value_usd", nullable = false)
-    private double totalValueUsd;
+    private double totalValueEur;
 
     @Column(name = "item_count", nullable = false)
     private int itemCount;
+
+    @Column(name = "total_cost_basis_eur")
+    private double totalCostBasisEur;
 
     /** @return the auto-generated database primary key */
     public Long getId() { return id; }
@@ -42,14 +45,20 @@ public class PortfolioSnapshot {
     public void setDate(LocalDate date) { this.date = date; }
 
     /** @return the estimated total market value of all tracked items in USD */
-    public double getTotalValueUsd() { return totalValueUsd; }
+    public double getTotalValueEur() { return totalValueEur; }
 
-    /** @param totalValueUsd the estimated total market value of all tracked items in USD */
-    public void setTotalValueUsd(double totalValueUsd) { this.totalValueUsd = totalValueUsd; }
+    /** @param totalValueEur the estimated total market value of all tracked items in USD */
+    public void setTotalValueEur(double totalValueEur) { this.totalValueEur = totalValueEur; }
 
     /** @return the number of items in the inventory on this date */
     public int getItemCount() { return itemCount; }
 
     /** @param itemCount the number of items in the inventory on this date */
     public void setItemCount(int itemCount) { this.itemCount = itemCount; }
+
+    /** @return the total cost basis in USD for all marketable items at the time of acquisition */
+    public double getTotalCostBasisEur() { return totalCostBasisEur; }
+
+    /** @param totalCostBasisEur the total cost basis in USD for all marketable items */
+    public void setTotalCostBasisEur(double totalCostBasisEur) { this.totalCostBasisEur = totalCostBasisEur; }
 }

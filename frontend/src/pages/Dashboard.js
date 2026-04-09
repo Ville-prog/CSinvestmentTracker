@@ -51,7 +51,7 @@ function Dashboard() {
       <div className="stat-cards">
         <div className="stat-card">
           <span className="stat-label">Total Value</span>
-          <span className="stat-value">${snapshot.totalValueUsd.toFixed(2)}</span>
+          <span className="stat-value">€{snapshot.totalValueEur.toFixed(2)}</span>
         </div>
         <div className="stat-card">
           <span className="stat-label">Items Tracked</span>

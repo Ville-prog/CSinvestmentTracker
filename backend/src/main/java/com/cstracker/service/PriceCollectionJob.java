@@ -78,6 +78,7 @@ public class PriceCollectionJob {
         log.info("Fetched {} items from inventory", items.size());
 
         double totalValue = 0.0;
+        double totalCostBasis = 0.0;
         int pricesCollected = 0;
 
         for (SteamItem steamItem : items) {
@@ -93,15 +94,28 @@ public class PriceCollectionJob {
 
             if (!steamItem.marketable()) continue;
 
-            if (priceRepository.findByItemAndDate(item, today).isPresent()) continue;
+            if (priceRepository.findByItemAndDate(item, today).isPresent()) {
+                totalCostBasis += item.getCostBasisEur();
+                totalValue += priceRepository.findByItemAndDate(item, today).get().getPriceEur() * steamItem.amount();
+                continue;
+            }
 
             double price = priceService.fetchPrice(steamItem.marketHashName());
+
+            if (steamItem.amount() > item.getTrackedQuantity()) {
+                int newUnits = steamItem.amount() - item.getTrackedQuantity();
+                item.setCostBasisEur(item.getCostBasisEur() + newUnits * price);
+                item.setTrackedQuantity(steamItem.amount());
+                itemRepository.save(item);
+            }
+
             totalValue += price * steamItem.amount();
+            totalCostBasis += item.getCostBasisEur();
 
             Price priceRecord = new Price();
             priceRecord.setItem(item);
             priceRecord.setDate(today);
-            priceRecord.setPriceUsd(price);
+            priceRecord.setPriceEur(price);
             priceRepository.save(priceRecord);
             pricesCollected++;
 
@@ -116,7 +130,8 @@ public class PriceCollectionJob {
 
         PortfolioSnapshot snapshot = new PortfolioSnapshot();
         snapshot.setDate(today);
-        snapshot.setTotalValueUsd(totalValue);
+        snapshot.setTotalValueEur(totalValue);
+        snapshot.setTotalCostBasisEur(totalCostBasis);
         snapshot.setItemCount(items.size());
         snapshotRepository.save(snapshot);
 

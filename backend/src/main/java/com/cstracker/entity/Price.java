@@ -32,7 +32,7 @@ public class Price {
     private LocalDate date;
 
     @Column(name = "price_usd", nullable = false)
-    private double priceUsd;
+    private double priceEur;
 
     /** @return the auto-generated database primary key */
     public Long getId() { return id; }
@@ -50,8 +50,8 @@ public class Price {
     public void setDate(LocalDate date) { this.date = date; }
 
     /** @return the Steam Market median price in USD for this item on this date */
-    public double getPriceUsd() { return priceUsd; }
+    public double getPriceEur() { return priceEur; }
 
-    /** @param priceUsd the Steam Market median price in USD for this item on this date */
-    public void setPriceUsd(double priceUsd) { this.priceUsd = priceUsd; }
+    /** @param priceEur the Steam Market median price in USD for this item on this date */
+    public void setPriceEur(double priceEur) { this.priceEur = priceEur; }
 }

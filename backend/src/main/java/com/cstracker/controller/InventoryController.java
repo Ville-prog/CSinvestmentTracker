@@ -60,7 +60,7 @@ public class InventoryController {
     public InventoryValue getInventoryValue(@PathVariable String steamId) {
         List<SteamItem> items = steamApiService.getInventory(steamId);
         List<PricedItem> pricedItems = priceService.addPrices(items);
-        double totalValueUsd = pricedItems.stream().mapToDouble(PricedItem::totalValueUsd).sum();
-        return new InventoryValue(steamId, items.size(), totalValueUsd, pricedItems);
+        double totalValueEur = pricedItems.stream().mapToDouble(PricedItem::totalValueEur).sum();
+        return new InventoryValue(steamId, items.size(), totalValueEur, pricedItems);
     }
 }

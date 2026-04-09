@@ -10,8 +10,8 @@ package com.cstracker.model;
  * @param tradable       whether the item can be traded
  * @param marketable     whether the item can be listed on the market
  * @param amount         quantity owned
- * @param priceUsd       current Steam Market median price in USD per unit
- * @param totalValueUsd  priceUsd multiplied by amount
+ * @param priceEur       current Steam Market median price in USD per unit
+ * @param totalValueEur  priceEur multiplied by amount
  */
 public record PricedItem(
         String classId,
@@ -21,6 +21,6 @@ public record PricedItem(
         boolean tradable,
         boolean marketable,
         int amount,
-        double priceUsd,
-        double totalValueUsd
+        double priceEur,
+        double totalValueEur
 ) {}
