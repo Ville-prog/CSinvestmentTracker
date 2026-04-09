@@ -29,8 +29,8 @@ import java.util.Map;
 public class MarketDataService {
 
     private static final Logger log = LoggerFactory.getLogger(MarketDataService.class);
-    private static final String YAHOO_URL =
-            "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1d&period1=%d&period2=%d";
+    private static final String YAHOO_BASE_URL =
+            "https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?interval=1d&period1=";
 
     private final RestTemplate restTemplate;
 
@@ -53,7 +53,7 @@ public class MarketDataService {
     public List<Map<String, Object>> fetchSp500Since(LocalDate from) {
         long period1 = from.atStartOfDay(ZoneOffset.UTC).toEpochSecond();
         long period2 = LocalDate.now().plusDays(1).atStartOfDay(ZoneOffset.UTC).toEpochSecond();
-        String url = String.format(YAHOO_URL, period1, period2);
+        String url = YAHOO_BASE_URL + period1 + "&period2=" + period2;
 
         List<Map<String, Object>> result = new ArrayList<>();
 
