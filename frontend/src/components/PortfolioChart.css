@@ -1,0 +1,26 @@
+.chart-range-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.range-btn {
+  background: none;
+  border: 1px solid #2a2a2a;
+  color: #888;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.15s;
+}
+
+.range-btn:hover {
+  border-color: #444;
+  color: #ccc;
+}
+
+.range-btn.active {
+  border-color: #4f9eff;
+  color: #4f9eff;
+}

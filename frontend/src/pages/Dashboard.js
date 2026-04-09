@@ -1,9 +1,23 @@
+/**
+ * Dashboard.js
+ *
+ * Main dashboard page displaying the latest portfolio value snapshot and the portfolio chart.
+ * Fetches the most recent snapshot from the backend on mount and passes it to child components.
+ *
+ * @author Ville Laaksoaho
+ * Dependencies: PortfolioChart.js, Dashboard.css
+ */
 import { useEffect, useState } from 'react';
 import PortfolioChart from '../components/PortfolioChart';
 import './Dashboard.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
+/**
+ * @brief Fetches and displays the latest portfolio snapshot including total value, item count, and chart.
+ *
+ * @returns {JSX.Element} The dashboard page with stat cards and portfolio chart
+ */
 function Dashboard() {
   const [snapshot, setSnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +46,7 @@ function Dashboard() {
   return (
     <div className="dashboard">
       <h1 className="page-title">CS2 Portfolio</h1>
-      <p className="snapshot-date">Last updated: {snapshot.date}</p>
+      <p className="snapshot-date">Last updated: {snapshot.date.split('-').reverse().join('.')}</p>
 
       <div className="stat-cards">
         <div className="stat-card">
@@ -45,7 +59,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <PortfolioChart fromDate={snapshot.date} />
+      <PortfolioChart />
     </div>
   );
 }

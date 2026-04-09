@@ -1,3 +1,11 @@
+/**
+ * ItemRepository.java
+ *
+ * Spring Data JPA repository for Item entities.
+ * Provides standard CRUD operations and a query to look up items by market hash name.
+ *
+ * @author Ville Laaksoaho
+ */
 package com.cstracker.repository;
 
 import com.cstracker.entity.Item;
@@ -6,5 +14,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
+
+    /**
+     * Finds an item by its full market hash name including wear condition.
+     *
+     * @param marketHashName the market hash name to search for (e.g. "AK-47 | Redline (Field-Tested)")
+     * @return an Optional containing the matching Item, or empty if not found
+     */
     Optional<Item> findByMarketHashName(String marketHashName);
 }

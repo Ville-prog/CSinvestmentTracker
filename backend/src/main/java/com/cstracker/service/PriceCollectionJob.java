@@ -1,3 +1,11 @@
+/**
+ * PriceCollectionJob.java
+ *
+ * Scheduled nightly job that collects Steam Market prices for all items in the tracked inventory.
+ * Upserts items into the database, saves daily price records, and creates a portfolio value snapshot.
+ *
+ * @author Ville Laaksoaho
+ */
 package com.cstracker.service;
 
 import com.cstracker.entity.Item;
@@ -31,6 +39,15 @@ public class PriceCollectionJob {
     @Value("${steam.user.id}")
     private String steamUserId;
 
+    /**
+     * Constructs the job with all required service and repository dependencies.
+     *
+     * @param steamApiService   service used to fetch the Steam inventory
+     * @param priceService      service used to fetch individual item prices from Steam Market
+     * @param itemRepository    repository for upserting item records
+     * @param priceRepository   repository for saving daily price records
+     * @param snapshotRepository repository for saving daily portfolio value snapshots
+     */
     public PriceCollectionJob(SteamApiService steamApiService, PriceService priceService,
                               ItemRepository itemRepository, PriceRepository priceRepository,
                               PortfolioSnapshotRepository snapshotRepository) {
@@ -41,7 +58,12 @@ public class PriceCollectionJob {
         this.snapshotRepository = snapshotRepository;
     }
 
-    // Runs daily at 02:00 UTC
+    /**
+     * Runs the full price collection cycle. Fetches the Steam inventory, upserts items into the
+     * database, collects a price per marketable item with rate limiting, and saves a daily portfolio
+     * snapshot. Skips execution if a snapshot already exists for today to prevent double runs.
+     * Scheduled to run at 02:00 UTC daily and can also be triggered manually via the API.
+     */
     @Scheduled(cron = "0 0 2 * * *")
     public void collectPrices() {
         LocalDate today = LocalDate.now();

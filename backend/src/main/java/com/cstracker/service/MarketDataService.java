@@ -1,3 +1,11 @@
+/**
+ * MarketDataService.java
+ *
+ * Service for fetching historical S&P 500 price data from the Yahoo Finance API.
+ * Returns daily closing prices as a list of date/close maps for use in portfolio comparison charts.
+ *
+ * @author Ville Laaksoaho
+ */
 package com.cstracker.service;
 
 import org.slf4j.Logger;
@@ -21,10 +29,22 @@ public class MarketDataService {
 
     private final RestTemplate restTemplate;
 
+    /**
+     * Constructs the service with the shared RestTemplate used for HTTP calls.
+     *
+     * @param restTemplate the RestTemplate bean injected by Spring
+     */
     public MarketDataService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * Fetches daily S&P 500 closing prices from Yahoo Finance between the given start date and today.
+     * Returns an empty list if the request fails or the response contains no data.
+     *
+     * @param from the start date (inclusive) for the historical price query
+     * @return list of maps each containing "date" (ISO string) and "close" (double) entries
+     */
     public List<Map<String, Object>> fetchSp500Since(LocalDate from) {
         long period1 = from.atStartOfDay(ZoneOffset.UTC).toEpochSecond();
         long period2 = LocalDate.now().plusDays(1).atStartOfDay(ZoneOffset.UTC).toEpochSecond();
