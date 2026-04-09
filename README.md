@@ -27,7 +27,7 @@ tbd
 
 ## How it works
 
-A nightly job runs at 2 AM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time. A portfolio snapshot (total value + item count) is also saved each night.
+A nightly job runs at 4 AM UTC+2, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time. A portfolio snapshot (total value + item count) is also saved each night.
 
 ## Charts
 
