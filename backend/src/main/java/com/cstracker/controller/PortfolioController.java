@@ -48,7 +48,7 @@ public class PortfolioController {
         if (!adminSecret.equals(secret)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        priceCollectionJob.collectPrices();
+        new Thread(priceCollectionJob::collectPrices).start();
         return "Price collection triggered";
     }
 }
