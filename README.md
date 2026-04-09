@@ -2,28 +2,46 @@
 
 A personal CS2 skin investment tracker that monitors portfolio value over time and compares it against the S&P 500.
 
-## Stack
-
-- **Backend:** Java 21 / Spring Boot 3, containerized with Docker for consistent, reproducible deployments, deployed on Railway
-- **Database:** PostgreSQL, managed by Railway
-- **Frontend:** React, planned, will be deployed publicly
-
-## Architecture
-
-tbd
-
 ## What is the CS2 skin market?
 
-CS2 (Counter-Strike 2) is a free-to-play shooter with an in-game economy where players own cosmetic weapon skins. These skins are stored on your Steam account and can be freely traded, bought, and sold. Unlike most in-game items, CS2 skins have real monetary value.
+CS2 (Counter-Strike 2) is a free-to-play competetive shooter made by Valve with an **in-game economy** where players own cosmetic weapon skins. These skins are stored on your Steam account and can be freely traded, bought, and sold. Unlike most in-game items, **CS2 skins have real monetary value.**
 
 **Converting skins to money:**
 - **Steam balance:** Skins sold on the Steam Market convert to Steam wallet funds, which can be used to purchase games, hardware like the Steam Deck, or other items
 - **Third-party platforms:** Sites like Skinport, CS.Money, and others allow users to sell skins for real money transferred directly to a bank account, PayPal, or crypto
 
 **The market as an investment:**
-The CS2 skin market has been active since 2013 and has grown into a multi-billion dollar economy. The overall market has historically shown steady appreciation over long time horizons, with some analyses placing its performance on par with or above the S&P 500 over 5-10 year periods. Unlike stocks, the market is driven by a combination of game popularity, item rarity, and cultural moments (major tournament stickers, limited releases), making certain items highly sought after collectibles.
+The CS2 skin market has been active since 2013 and has grown into a **multi-billion dollar economy.** The overall market has historically shown steady appreciation over long time horizons, **with some analyses placing its performance on par with or above the S&P 500** over 5-10 year periods.
 
-That said, individual items can be volatile. The market behaves more like an index when looked at in aggregate, smoothing out the swings of individual skins. This tracker takes that view, measuring total portfolio value rather than betting on single items.
+That said, individual items can be volatile. **The market behaves more like an index** when looked at in aggregate, smoothing out the swings of individual skins. **This tracker takes that view, measuring total portfolio value rather than betting on single items.**
+
+## Stack
+
+- **Backend:** Java 21 / Spring Boot 3, containerized with Docker for consistent, reproducible deployments, deployed on Railway
+- **Database:** PostgreSQL, managed by Railway
+- **Frontend:** React, planned, will be deployed publicly
+
+## Structure
+
+tbd
+
+## How it works
+
+A nightly job runs at 2 AM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time. A portfolio snapshot (total value + item count) is also saved each night.
+
+## Portfolio vs S&P 500 comparison
+
+The chart compares CS2 portfolio performance against the S&P 500 using **two different calculations:**
+
+**S&P 500:** Normalized to percentage change from the date the first steam inventory portfolio snapshot was recorded. This represents what a comparable investment in the index would have returned since tracking began.
+
+**CS2 Portfolio:** Shown as profit/loss percentage relative to cost basis:
+
+```
+P&L % = (current value - cost basis) / cost basis * 100
+```
+
+Cost basis is tracked per item and recorded at the market price on the day the item first becomes marketable (either on first inventory scan, or when a trade cooldown expires). When more units of the same item are added later, the additional units are recorded at that day's price, building up the cost basis incrementally. **This means the portfolio line only moves when prices change, not when new items are added to the inventory.**
 
 ## Steam API limitations
 
@@ -34,11 +52,6 @@ This app currently only works for a single, hardcoded Steam inventory (mine). Th
 - Many third-party sites bypass these limits by running large networks of Steam bot accounts that scrape data continuously, which violates Steam's Terms of Service
 
 This app takes the compliant approach: a nightly price collection job that respects rate limits (one request every 43 seconds). This works well in practice because CS2 skin prices don't fluctuate significantly day-to-day, making daily snapshots sufficient for investment tracking.
-
-## How it works
-
-A nightly job runs at 2 AM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time. A portfolio snapshot (total value + item count) is also saved each night.
-
 
 ## Limitations and future improvements
 
