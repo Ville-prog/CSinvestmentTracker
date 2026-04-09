@@ -71,7 +71,7 @@ public class MarketDataService {
             if (resultList == null || resultList.isEmpty()) return result;
 
             Map data = (Map) resultList.get(0);
-            List<Long> timestamps = (List<Long>) data.get("timestamp");
+            List<Number> timestamps = (List<Number>) data.get("timestamp");
             Map indicators = (Map) data.get("indicators");
             List quotes = (List) indicators.get("quote");
             Map quote = (Map) quotes.get(0);
@@ -80,7 +80,7 @@ public class MarketDataService {
             for (int i = 0; i < timestamps.size(); i++) {
                 Double close = closes.get(i);
                 if (close == null) continue;
-                LocalDate date = Instant.ofEpochSecond(timestamps.get(i))
+                LocalDate date = Instant.ofEpochSecond(timestamps.get(i).longValue())
                         .atZone(ZoneOffset.UTC).toLocalDate();
                 result.add(Map.of("date", date.toString(), "close", close));
             }
