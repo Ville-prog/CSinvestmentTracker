@@ -33,7 +33,7 @@ public class PortfolioSnapshot {
     private int itemCount;
 
     @Column(name = "total_cost_basis_eur")
-    private double totalCostBasisEur;
+    private Double totalCostBasisEur;
 
     /** @return the auto-generated database primary key */
     public Long getId() { return id; }
@@ -56,9 +56,9 @@ public class PortfolioSnapshot {
     /** @param itemCount the number of items in the inventory on this date */
     public void setItemCount(int itemCount) { this.itemCount = itemCount; }
 
-    /** @return the total cost basis in USD for all marketable items at the time of acquisition */
-    public double getTotalCostBasisEur() { return totalCostBasisEur; }
+    /** @return the total cost basis in EUR for all marketable items at the time of acquisition, or 0 if not yet set */
+    public double getTotalCostBasisEur() { return totalCostBasisEur != null ? totalCostBasisEur : 0.0; }
 
-    /** @param totalCostBasisEur the total cost basis in USD for all marketable items */
+    /** @param totalCostBasisEur the total cost basis in EUR for all marketable items */
     public void setTotalCostBasisEur(double totalCostBasisEur) { this.totalCostBasisEur = totalCostBasisEur; }
 }

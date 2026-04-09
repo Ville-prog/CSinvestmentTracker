@@ -35,10 +35,10 @@ public class Item {
     private String iconUrl;
 
     @Column(name = "cost_basis_eur")
-    private double costBasisEur = 0.0;
+    private Double costBasisEur;
 
     @Column(name = "tracked_quantity")
-    private int trackedQuantity = 0;
+    private Integer trackedQuantity;
 
     /** @return the auto-generated database primary key */
     public Long getId() { return id; }
@@ -67,14 +67,14 @@ public class Item {
     /** @param iconUrl the Steam CDN icon URL for the item */
     public void setIconUrl(String iconUrl) { this.iconUrl = iconUrl; }
 
-    /** @return the total cost basis in USD across all tracked units */
-    public double getCostBasisEur() { return costBasisEur; }
+    /** @return the total cost basis in EUR across all tracked units, or 0 if not yet set */
+    public double getCostBasisEur() { return costBasisEur != null ? costBasisEur : 0.0; }
 
-    /** @param costBasisEur the total cost basis in USD across all tracked units */
+    /** @param costBasisEur the total cost basis in EUR across all tracked units */
     public void setCostBasisEur(double costBasisEur) { this.costBasisEur = costBasisEur; }
 
-    /** @return the number of units for which a cost basis has been recorded */
-    public int getTrackedQuantity() { return trackedQuantity; }
+    /** @return the number of units for which a cost basis has been recorded, or 0 if not yet set */
+    public int getTrackedQuantity() { return trackedQuantity != null ? trackedQuantity : 0; }
 
     /** @param trackedQuantity the number of units for which a cost basis has been recorded */
     public void setTrackedQuantity(int trackedQuantity) { this.trackedQuantity = trackedQuantity; }
