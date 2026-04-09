@@ -73,7 +73,7 @@ public class PriceService {
      * @param marketHashName the full market name of the item including wear
      * @return median price in USD, or 0.0 on failure
      */
-    private double fetchPrice(String marketHashName) {
+    double fetchPrice(String marketHashName) {
         try {
             String encoded = URLEncoder.encode(marketHashName, StandardCharsets.UTF_8);
             String url = String.format(PRICE_URL, encoded);

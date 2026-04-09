@@ -1,0 +1,103 @@
+package com.cstracker.service;
+
+import com.cstracker.entity.Item;
+import com.cstracker.entity.PortfolioSnapshot;
+import com.cstracker.entity.Price;
+import com.cstracker.model.SteamItem;
+import com.cstracker.repository.ItemRepository;
+import com.cstracker.repository.PortfolioSnapshotRepository;
+import com.cstracker.repository.PriceRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Component
+public class PriceCollectionJob {
+
+    private static final Logger log = LoggerFactory.getLogger(PriceCollectionJob.class);
+    private static final int RATE_LIMIT_DELAY_MS = 43000;
+
+    private final SteamApiService steamApiService;
+    private final PriceService priceService;
+    private final ItemRepository itemRepository;
+    private final PriceRepository priceRepository;
+    private final PortfolioSnapshotRepository snapshotRepository;
+
+    @Value("${steam.user.id}")
+    private String steamUserId;
+
+    public PriceCollectionJob(SteamApiService steamApiService, PriceService priceService,
+                              ItemRepository itemRepository, PriceRepository priceRepository,
+                              PortfolioSnapshotRepository snapshotRepository) {
+        this.steamApiService = steamApiService;
+        this.priceService = priceService;
+        this.itemRepository = itemRepository;
+        this.priceRepository = priceRepository;
+        this.snapshotRepository = snapshotRepository;
+    }
+
+    // Runs daily at 02:00 UTC
+    @Scheduled(cron = "0 0 2 * * *")
+    public void collectPrices() {
+        LocalDate today = LocalDate.now();
+        log.info("Starting nightly price collection for {}", today);
+
+        if (snapshotRepository.findByDate(today).isPresent()) {
+            log.info("Price collection already ran today, skipping.");
+            return;
+        }
+
+        List<SteamItem> items = steamApiService.getInventory(steamUserId);
+        log.info("Fetched {} items from inventory", items.size());
+
+        double totalValue = 0.0;
+        int pricesCollected = 0;
+
+        for (SteamItem steamItem : items) {
+            Item item = itemRepository.findByMarketHashName(steamItem.marketHashName())
+                    .orElseGet(() -> {
+                        Item newItem = new Item();
+                        newItem.setMarketHashName(steamItem.marketHashName());
+                        newItem.setName(steamItem.name());
+                        newItem.setClassId(steamItem.classId());
+                        newItem.setIconUrl(steamItem.iconUrl());
+                        return itemRepository.save(newItem);
+                    });
+
+            if (!steamItem.marketable()) continue;
+
+            if (priceRepository.findByItemAndDate(item, today).isPresent()) continue;
+
+            double price = priceService.fetchPrice(steamItem.marketHashName());
+            totalValue += price * steamItem.amount();
+
+            Price priceRecord = new Price();
+            priceRecord.setItem(item);
+            priceRecord.setDate(today);
+            priceRecord.setPriceUsd(price);
+            priceRepository.save(priceRecord);
+            pricesCollected++;
+
+            try {
+                Thread.sleep(RATE_LIMIT_DELAY_MS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("Price collection interrupted");
+                break;
+            }
+        }
+
+        PortfolioSnapshot snapshot = new PortfolioSnapshot();
+        snapshot.setDate(today);
+        snapshot.setTotalValueUsd(totalValue);
+        snapshot.setItemCount(items.size());
+        snapshotRepository.save(snapshot);
+
+        log.info("Price collection complete. {} prices saved. Total value: ${:.2f}", pricesCollected, totalValue);
+    }
+}
