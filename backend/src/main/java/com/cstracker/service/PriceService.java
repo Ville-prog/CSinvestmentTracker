@@ -79,7 +79,10 @@ public class PriceService {
             String url = String.format(PRICE_URL, encoded);
             SteamPriceResponse response = restTemplate.getForObject(url, SteamPriceResponse.class);
 
-            if (response == null || !response.isSuccess()) return 0.0;
+            if (response == null || !response.isSuccess()) {
+                log.warn("No price data for '{}'", marketHashName);
+                return 0.0;
+            }
 
             String priceStr = response.getMedianPrice() != null
                     ? response.getMedianPrice()
@@ -105,6 +108,7 @@ public class PriceService {
         try {
             String cleaned = priceStr
                     .replaceAll("[€$\\s]", "")
+                    .replace("--", "00")
                     .replace(".", "")
                     .replace(",", ".");
             return Double.parseDouble(cleaned);
