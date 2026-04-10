@@ -15,19 +15,11 @@ The CS2 skin market has been active since 2013 and has grown into a **multi-bill
 
 That said, individual items can be volatile. **The market behaves more like an index** when looked at in aggregate, smoothing out the swings of individual skins. **This tracker takes that view, measuring total portfolio value rather than betting on single items.**
 
-## Stack
 
-- **Backend:** Java 21 / Spring Boot 3, containerized with Docker for consistent, reproducible deployments, deployed on Railway
-- **Database:** PostgreSQL, managed by Railway
-- **Frontend:** React, planned, will be deployed publicly
-
-## Structure
-
-tbd
 
 ## How it works
 
-A nightly job runs at 4 AM UTC+2, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time. A portfolio snapshot (total value + item count) is also saved each night.
+A nightly job runs at 11 PM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time. A portfolio snapshot (total value + item count) is also saved each night.
 
 ## Charts
 
@@ -56,6 +48,16 @@ This app currently only works for a single, hardcoded Steam inventory (mine). Th
 - Many third-party sites bypass these limits by running large networks of Steam bot accounts that scrape data continuously, which violates Steam's Terms of Service
 
 This app takes the compliant approach: a nightly price collection job that respects rate limits (one request every 43 seconds). This works well in practice because CS2 skin prices don't fluctuate significantly day-to-day, making daily snapshots sufficient for investment tracking.
+
+## Stack
+
+- **Backend:** Java 21 / Spring Boot 3, containerized with Docker for consistent, reproducible deployments, deployed on Railway
+- **Database:** PostgreSQL, managed by Railway
+- **Frontend:** React, planned, will be deployed publicly
+
+## Structure
+
+tbd
 
 ## Limitations and future improvements
 

@@ -117,13 +117,16 @@ function PortfolioChart() {
               })
             );
 
-            const merged = normSp500
-              .filter(p => p.date >= sp500From)
-              .map(p => ({
-                date: p.date,
-                sp500: sp500Map[p.date] ?? null,
-                portfolio: portfolioMap[p.date] ?? null
-              }));
+            const allDates = [...new Set([
+              ...normSp500.filter(p => p.date >= sp500From).map(p => p.date),
+              ...history.filter(h => h.date >= sp500From).map(h => h.date)
+            ])].sort();
+
+            const merged = allDates.map(date => ({
+              date,
+              sp500: sp500Map[date] ?? null,
+              portfolio: portfolioMap[date] ?? null
+            }));
 
             setData(merged);
             setLoading(false);

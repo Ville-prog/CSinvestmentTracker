@@ -64,7 +64,7 @@ public class PriceCollectionJob {
      * snapshot. Skips execution if a snapshot already exists for today to prevent double runs.
      * Scheduled to run at 02:00 UTC daily and can also be triggered manually via the API.
      */
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "0 0 23 * * *")
     public void collectPrices() {
         LocalDate today = LocalDate.now();
         log.info("Starting nightly price collection for {}", today);
