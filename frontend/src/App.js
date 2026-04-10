@@ -1,14 +1,15 @@
 /**
  * App.js
  *
- * Root application component with top-level navigation between Dashboard and Inventory pages.
+ * Root application component with top-level navigation between Dashboard, Inventory, and About pages.
  *
  * @author Ville Laaksoaho
- * Dependencies: Dashboard.js, Inventory.js, App.css
+ * Dependencies: Dashboard.js, Inventory.js, About.js, App.css
  */
 import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
 import Inventory from './pages/Inventory';
+import About from './pages/About';
 import './App.css';
 
 /**
@@ -34,9 +35,17 @@ function App() {
         >
           Inventory
         </button>
+        <button
+          className={`nav-btn ${page === 'about' ? 'active' : ''}`}
+          onClick={() => setPage('about')}
+        >
+          About
+        </button>
       </nav>
 
-      {page === 'dashboard' ? <Dashboard /> : <Inventory />}
+      {page === 'dashboard' && <Dashboard />}
+      {page === 'inventory' && <Inventory />}
+      {page === 'about' && <About />}
     </div>
   );
 }

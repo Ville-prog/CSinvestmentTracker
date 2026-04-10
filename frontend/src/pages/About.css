@@ -1,0 +1,48 @@
+.about-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.about-heading {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.about-section p {
+  color: #aaa;
+  line-height: 1.65;
+  font-size: 14px;
+}
+
+.about-formula {
+  background-color: #111;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #e0e0e0;
+  font-family: 'Courier New', monospace;
+}
+
+.about-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.about-list li {
+  color: #aaa;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.about-list li strong {
+  color: #e0e0e0;
+}

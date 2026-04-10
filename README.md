@@ -56,7 +56,7 @@ This app takes the compliant approach: a nightly price collection job that respe
 ## Stack
 
 - **Backend:** Java 21 / Spring Boot 3, deployed on Railway via Docker
-- **Database:** PostgreSQL, managed by Railway
+- **Database:** PostgreSQL, managed trough Railway
 - **Frontend:** React with Recharts, deployed on Vercel
 - **External APIs:** Steam Community Market (prices), Yahoo Finance (S&P 500 history)
 
