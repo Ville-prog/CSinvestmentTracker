@@ -98,6 +98,19 @@ function PortfolioValueChart() {
         ))}
       </div>
 
+      {!loading && data.length > 1 && (() => {
+        const first = data[0].value;
+        const last = data[data.length - 1].value;
+        const change = ((last - first) / first * 100).toFixed(2);
+        return (
+          <div className="chart-summary">
+            <span className={`chart-summary-stat ${change > 0 ? 'positive' : change < 0 ? 'negative' : ''}`}>
+              {change > 0 ? '+' : ''}{change}%
+            </span>
+          </div>
+        );
+      })()}
+
       {loading ? (
         <p className="status-text">Loading chart...</p>
       ) : data.length === 0 ? (

@@ -150,12 +150,33 @@ function PortfolioChart() {
           ))}
         </div>
         <button
-          className={`range-btn ${showSp500 ? 'active' : ''}`}
+          className={`range-btn sp500-btn ${showSp500 ? 'active' : ''}`}
           onClick={() => setShowSp500(v => !v)}
         >
           S&P 500
         </button>
       </div>
+
+      {!loading && data.length > 0 && (() => {
+        const last = data[data.length - 1];
+        const portfolioVal = last?.portfolio;
+        const sp500Val = last?.sp500;
+        const fmt = v => v != null ? `${v > 0 ? '+' : ''}${v.toFixed(2)}%` : null;
+        return (
+          <div className="chart-summary">
+            {portfolioVal != null && (
+              <span className={`chart-summary-stat ${portfolioVal > 0 ? 'positive' : portfolioVal < 0 ? 'negative' : ''}`}>
+                CS2 {fmt(portfolioVal)}
+              </span>
+            )}
+            {showSp500 && sp500Val != null && (
+              <span className="chart-summary-stat sp500">
+                S&P 500 {fmt(sp500Val)}
+              </span>
+            )}
+          </div>
+        );
+      })()}
 
       {loading ? (
         <p className="status-text">Loading chart...</p>
