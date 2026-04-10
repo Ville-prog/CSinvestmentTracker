@@ -27,13 +27,13 @@
 }
 
 .range-btn.active {
-  border-color: #4f9eff;
-  color: #4f9eff;
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 .range-btn.sp500-btn.active {
-  border-color: #f0c040;
-  color: #f0c040;
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
 .chart-summary {
