@@ -79,6 +79,7 @@ public class PriceCollectionJob {
 
         double totalValue = 0.0;
         double totalCostBasis = 0.0;
+        int totalUnits = 0;
         int pricesCollected = 0;
 
         for (SteamItem steamItem : items) {
@@ -93,6 +94,8 @@ public class PriceCollectionJob {
                     });
 
             if (!steamItem.marketable()) continue;
+
+            totalUnits += steamItem.amount();
 
             if (priceRepository.findByItemAndDate(item, today).isPresent()) {
                 totalCostBasis += item.getCostBasisEur();
@@ -132,7 +135,6 @@ public class PriceCollectionJob {
         snapshot.setDate(today);
         snapshot.setTotalValueEur(totalValue);
         snapshot.setTotalCostBasisEur(totalCostBasis);
-        int totalUnits = items.stream().mapToInt(SteamItem::amount).sum();
         snapshot.setItemCount(totalUnits);
         snapshotRepository.save(snapshot);
 
