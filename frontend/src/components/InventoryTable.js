@@ -58,14 +58,14 @@ function InventoryTable({ items }) {
    * @brief Renders a column header with a sort indicator arrow.
    *
    * @param {string} label Display label for the column
-   * @param {string} key Data key this column sorts by
+   * @param {string} col Data key this column sorts by
    * @returns {JSX.Element} A th element with sort indicator
    */
-  function Th({ label, key }) {
-    const active = sortKey === key;
+  function Th({ label, col }) {
+    const active = sortKey === col;
     const arrow = active ? (sortAsc ? ' ↑' : ' ↓') : '';
     return (
-      <th className={`sortable ${active ? 'active' : ''}`} onClick={() => handleSort(key)}>
+      <th className={`sortable ${active ? 'active' : ''}`} onClick={() => handleSort(col)}>
         {label}{arrow}
       </th>
     );
@@ -77,12 +77,11 @@ function InventoryTable({ items }) {
         <thead>
           <tr>
             <th></th>
-            <Th label="Name" key="name" />
-            <Th label="Qty" key="quantity" />
-            <Th label="Price" key="priceEur" />
-            <Th label="Total Value" key="totalValueEur" />
-            <Th label="Cost Basis / unit" key="costBasisPerUnit" />
-            <Th label="P&L %" key="pnlPct" />
+            <Th label="Name" col="name" />
+            <Th label="Qty" col="quantity" />
+            <Th label="Price" col="priceEur" />
+            <Th label="Total Value" col="totalValueEur" />
+            <Th label="P&L %" col="pnlPct" />
           </tr>
         </thead>
         <tbody>
@@ -101,7 +100,6 @@ function InventoryTable({ items }) {
               <td>{item.quantity}</td>
               <td>€{item.priceEur.toFixed(2)}</td>
               <td>€{item.totalValueEur.toFixed(2)}</td>
-              <td>€{item.costBasisPerUnit.toFixed(2)}</td>
               <td className={item.pnlPct > 0 ? 'positive' : item.pnlPct < 0 ? 'negative' : ''}>
                 {formatPct(item.pnlPct)}
               </td>

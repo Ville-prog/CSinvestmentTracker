@@ -56,7 +56,7 @@ function Dashboard() {
           <span className="stat-value">€{snapshot.totalValueEur.toFixed(2)}</span>
         </div>
         <div className="stat-card">
-          <span className="stat-label">Items in Inventory</span>
+          <span className="stat-label">Total Units</span>
           <span className="stat-value">{snapshot.itemCount}</span>
         </div>
       </div>

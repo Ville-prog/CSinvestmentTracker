@@ -132,7 +132,8 @@ public class PriceCollectionJob {
         snapshot.setDate(today);
         snapshot.setTotalValueEur(totalValue);
         snapshot.setTotalCostBasisEur(totalCostBasis);
-        snapshot.setItemCount(items.size());
+        int totalUnits = items.stream().mapToInt(SteamItem::amount).sum();
+        snapshot.setItemCount(totalUnits);
         snapshotRepository.save(snapshot);
 
         log.info("Price collection complete. {} prices saved. Total value: ${:.2f}", pricesCollected, totalValue);
