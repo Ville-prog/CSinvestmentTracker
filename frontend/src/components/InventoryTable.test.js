@@ -53,7 +53,7 @@ test('applies negative class to negative P&L', () => {
 
 test('applies no color class to zero P&L', () => {
   render(<InventoryTable items={sampleItems} />);
-  const cell = screen.getByText('+0.00%');
+  const cell = screen.getByText('0.00%');
   expect(cell).not.toHaveClass('positive');
   expect(cell).not.toHaveClass('negative');
 });
@@ -66,19 +66,19 @@ test('defaults to sorting by total value descending', () => {
   expect(rows[2]).toHaveTextContent('USP-S | Kill Confirmed');
 });
 
-test('sorts by name ascending on header click', async () => {
+test('sorts by name ascending on header click', () => {
   render(<InventoryTable items={sampleItems} />);
-  await userEvent.click(screen.getByText('Name'));
+  userEvent.click(screen.getByText('Name'));
   const rows = screen.getAllByRole('row').slice(1);
   expect(rows[0]).toHaveTextContent('AK-47 | Redline');
   expect(rows[1]).toHaveTextContent('Glock-18 | Water Elemental');
   expect(rows[2]).toHaveTextContent('USP-S | Kill Confirmed');
 });
 
-test('toggles sort direction on second header click', async () => {
+test('toggles sort direction on second header click', () => {
   render(<InventoryTable items={sampleItems} />);
-  await userEvent.click(screen.getByText('Name'));
-  await userEvent.click(screen.getByText(/Name/));
+  userEvent.click(screen.getByText('Name'));
+  userEvent.click(screen.getByText(/Name/));
   const rows = screen.getAllByRole('row').slice(1);
   expect(rows[0]).toHaveTextContent('USP-S | Kill Confirmed');
 });
