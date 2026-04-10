@@ -170,7 +170,7 @@ function PortfolioChart() {
               </span>
             )}
             {showSp500 && sp500Val != null && (
-              <span className="chart-summary-stat sp500">
+              <span className={`chart-summary-stat ${sp500Val > 0 ? 'positive' : sp500Val < 0 ? 'negative' : ''}`}>
                 S&P 500 {fmt(sp500Val)}
               </span>
             )}

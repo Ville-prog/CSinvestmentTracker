@@ -101,11 +101,12 @@ function PortfolioValueChart() {
       {!loading && data.length > 1 && (() => {
         const first = data[0].value;
         const last = data[data.length - 1].value;
-        const change = ((last - first) / first * 100).toFixed(2);
+        const change = last - first;
+        const formatted = `${change > 0 ? '+' : ''}€${change.toFixed(2)}`;
         return (
           <div className="chart-summary">
             <span className={`chart-summary-stat ${change > 0 ? 'positive' : change < 0 ? 'negative' : ''}`}>
-              {change > 0 ? '+' : ''}{change}%
+              {formatted}
             </span>
           </div>
         );
