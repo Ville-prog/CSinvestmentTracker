@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, ReferenceLine, Legend
+  ResponsiveContainer, ReferenceLine, Legend, CartesianGrid
 } from 'recharts';
 import './PortfolioChart.css';
 
@@ -192,6 +192,7 @@ function PortfolioChart() {
               formatter={name => name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'}
               wrapperStyle={{ fontSize: 13, color: '#888' }}
             />
+            <CartesianGrid stroke="#222" strokeDasharray="3 3" vertical={false} />
             <ReferenceLine y={0} stroke="#333" strokeDasharray="3 3" />
             {showSp500 && <Line type="monotone" dataKey="sp500" stroke="#f0c040" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />}
             <Line type="monotone" dataKey="portfolio" stroke="#4f9eff" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />

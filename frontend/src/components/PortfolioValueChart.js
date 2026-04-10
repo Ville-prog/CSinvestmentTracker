@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer, CartesianGrid
 } from 'recharts';
 import './PortfolioChart.css';
 
@@ -126,6 +126,7 @@ function PortfolioValueChart() {
               contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6 }}
               labelStyle={{ color: '#888' }}
             />
+            <CartesianGrid stroke="#222" strokeDasharray="3 3" vertical={false} />
             <Line type="monotone" dataKey="value" stroke="#4f9eff" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
           </LineChart>
         </ResponsiveContainer>
