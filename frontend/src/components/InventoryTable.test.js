@@ -66,19 +66,19 @@ test('defaults to sorting by total value descending', () => {
   expect(rows[2]).toHaveTextContent('USP-S | Kill Confirmed');
 });
 
-test('sorts by name ascending on header click', () => {
+test('sorts by name descending on header click', () => {
   render(<InventoryTable items={sampleItems} />);
   userEvent.click(screen.getByText('Name'));
   const rows = screen.getAllByRole('row').slice(1);
-  expect(rows[0]).toHaveTextContent('AK-47 | Redline');
+  expect(rows[0]).toHaveTextContent('USP-S | Kill Confirmed');
   expect(rows[1]).toHaveTextContent('Glock-18 | Water Elemental');
-  expect(rows[2]).toHaveTextContent('USP-S | Kill Confirmed');
+  expect(rows[2]).toHaveTextContent('AK-47 | Redline');
 });
 
-test('toggles sort direction on second header click', () => {
+test('toggles to name ascending on second header click', () => {
   render(<InventoryTable items={sampleItems} />);
   userEvent.click(screen.getByText('Name'));
   userEvent.click(screen.getByText(/Name/));
   const rows = screen.getAllByRole('row').slice(1);
-  expect(rows[0]).toHaveTextContent('USP-S | Kill Confirmed');
+  expect(rows[0]).toHaveTextContent('AK-47 | Redline');
 });
