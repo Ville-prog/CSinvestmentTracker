@@ -33,7 +33,7 @@ function About() {
       <div className="about-section">
         <h2 className="about-heading">How it works</h2>
         <p>A nightly job runs at 11 PM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time.</p>
-        <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 43 seconds. This is the compliant approach. Many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
+        <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 129 seconds. This is the compliant approach. Many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
       </div>
 
       <div className="about-section">

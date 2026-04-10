@@ -55,7 +55,7 @@ This app currently only works for a single, hardcoded Steam inventory (mine). Th
 - There is no official API for real-time CS2 market prices
 - Many third-party sites bypass these limits by running large networks of Steam bot accounts that scrape data continuously, which violates Steam's Terms of Service
 
-This app takes the compliant approach: a nightly price collection job that respects rate limits (one request every 43 seconds). This works well in practice because CS2 skin prices don't fluctuate significantly day-to-day, making daily snapshots sufficient for investment tracking.
+This app takes the compliant approach: a nightly price collection job that respects rate limits (one request every 129 seconds). This works well in practice because CS2 skin prices don't fluctuate significantly day-to-day, making daily snapshots sufficient for investment tracking.
 
 ## Stack
 

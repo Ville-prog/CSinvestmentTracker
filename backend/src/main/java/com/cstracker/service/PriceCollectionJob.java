@@ -28,7 +28,7 @@ import java.util.List;
 public class PriceCollectionJob {
 
     private static final Logger log = LoggerFactory.getLogger(PriceCollectionJob.class);
-    private static final int RATE_LIMIT_DELAY_MS = 43000;
+    private static final int RATE_LIMIT_DELAY_MS = 129000;
 
     private final SteamApiService steamApiService;
     private final PriceService priceService;
