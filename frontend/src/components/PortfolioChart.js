@@ -82,7 +82,7 @@ function PortfolioChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState('1W');
-  const [showSp500, setShowSp500] = useState(true);
+  const [showSp500, setShowSp500] = useState(false);
 
   useEffect(() => {
     const selectedRange = RANGES.find(r => r.label === range);
