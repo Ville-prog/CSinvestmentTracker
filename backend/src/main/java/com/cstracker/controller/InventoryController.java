@@ -7,9 +7,11 @@
  */
 package com.cstracker.controller;
 
+import com.cstracker.model.InventoryItemView;
 import com.cstracker.model.InventoryValue;
 import com.cstracker.model.PricedItem;
 import com.cstracker.model.SteamItem;
+import com.cstracker.service.InventoryService;
 import com.cstracker.service.PriceService;
 import com.cstracker.service.SteamApiService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,16 +27,19 @@ public class InventoryController {
 
     private final SteamApiService steamApiService;
     private final PriceService priceService;
+    private final InventoryService inventoryService;
 
     /**
      * Constructs the controller with required service dependencies.
      *
-     * @param steamApiService service used to fetch CS2 inventory data from Steam
-     * @param priceService    service used to fetch Steam Market prices
+     * @param steamApiService  service used to fetch CS2 inventory data from Steam
+     * @param priceService     service used to fetch Steam Market prices
+     * @param inventoryService service used to build the tracked inventory view from the database
      */
-    public InventoryController(SteamApiService steamApiService, PriceService priceService) {
+    public InventoryController(SteamApiService steamApiService, PriceService priceService, InventoryService inventoryService) {
         this.steamApiService = steamApiService;
         this.priceService = priceService;
+        this.inventoryService = inventoryService;
     }
 
     /**
@@ -47,6 +52,18 @@ public class InventoryController {
     @GetMapping("/{steamId}")
     public List<SteamItem> getInventory(@PathVariable String steamId) {
         return steamApiService.getInventory(steamId);
+    }
+
+    /**
+     * Returns all tracked items from the database with latest price and P&L data.
+     * GET /api/inventory/items
+     * Does not call the Steam API — reads from the local database only.
+     *
+     * @return list of InventoryItemView records sorted by total value descending
+     */
+    @GetMapping("/items")
+    public List<InventoryItemView> getItems() {
+        return inventoryService.getInventoryItems();
     }
 
     /**
