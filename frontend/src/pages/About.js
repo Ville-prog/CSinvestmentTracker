@@ -21,7 +21,7 @@ function About() {
 
       <div className="about-section">
         <h2 className="about-heading">What is this?</h2>
-        <p>A personal CS2 skin investment tracker that monitors portfolio value over time and compares it against the S&P 500. Built as a CV project to demonstrate a full-stack Java/React application with real data.</p>
+        <p>A personal CS2 skin investment tracker that monitors portfolio value over time and compares it against the S&P 500.</p>
       </div>
 
       <div className="about-section">
@@ -33,14 +33,14 @@ function About() {
       <div className="about-section">
         <h2 className="about-heading">How it works</h2>
         <p>A nightly job runs at 11 PM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time.</p>
-        <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 43 seconds. This is the compliant approach — many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
+        <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 43 seconds. This is the compliant approach. Many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
       </div>
 
       <div className="about-section">
         <h2 className="about-heading">P&L calculation</h2>
         <p>Portfolio profit/loss is calculated relative to cost basis:</p>
         <pre className="about-formula">P&L % = (current value − cost basis) / cost basis × 100</pre>
-        <p>Each item's cost basis is set to its market price on the day it first becomes available for sale. This means the chart only moves when prices change — adding new items does not count as a gain. This mirrors how real investment portfolio trackers work.</p>
+        <p>Each item's cost basis is set to its market price on the day it first becomes available for sale. This means the chart only moves when prices change. Adding new items does not count as a gain. This mirrors how real investment portfolio trackers work.</p>
       </div>
 
       <div className="about-section">

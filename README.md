@@ -43,6 +43,10 @@ Each item's cost basis is set to its market price on the day it first becomes av
 
 A sortable table of all tracked items showing name, item icon, quantity, price per unit, total value, and P&L % per item. Sortable by any column.
 
+### About Page
+
+A short summary of the project.
+
 ## Steam API limitations
 
 This app currently only works for a single, hardcoded Steam inventory (mine). This is a deliberate design choice due to Steam API restrictions:
