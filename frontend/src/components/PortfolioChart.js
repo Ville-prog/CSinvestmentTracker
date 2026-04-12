@@ -122,11 +122,15 @@ function PortfolioChart() {
               ...history.filter(h => h.date >= sp500From).map(h => h.date)
             ])].sort();
 
-            const merged = allDates.map(date => ({
-              date,
-              sp500: sp500Map[date] ?? null,
-              portfolio: portfolioMap[date] ?? null
-            }));
+            let lastSp500Pct = null;
+            const merged = allDates.map(date => {
+              if (sp500Map[date] != null) lastSp500Pct = sp500Map[date];
+              return {
+                date,
+                sp500: lastSp500Pct,
+                portfolio: portfolioMap[date] ?? null
+              };
+            });
 
             setData(merged);
             setLoading(false);
@@ -160,7 +164,8 @@ function PortfolioChart() {
       {!loading && data.length > 0 && (() => {
         const last = data[data.length - 1];
         const portfolioVal = last?.portfolio;
-        const sp500Val = last?.sp500;
+        const lastSp500 = [...data].reverse().find(p => p.sp500 != null);
+        const sp500Val = lastSp500?.sp500;
         const fmt = v => v != null ? `${v > 0 ? '+' : ''}${v.toFixed(2)}%` : null;
         return (
           <div className="chart-summary">
