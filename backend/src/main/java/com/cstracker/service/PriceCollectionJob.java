@@ -105,6 +105,11 @@ public class PriceCollectionJob {
 
             double price = priceService.fetchPrice(steamItem.marketHashName());
 
+            if (price <= 0.0) {
+                log.warn("Skipping price save for '{}' — received price={}", steamItem.marketHashName(), price);
+                continue;
+            }
+
             if (steamItem.amount() > item.getTrackedQuantity()) {
                 int newUnits = steamItem.amount() - item.getTrackedQuantity();
                 item.setCostBasisEur(item.getCostBasisEur() + newUnits * price);
