@@ -117,10 +117,10 @@ function PortfolioChart() {
               })
             );
 
-            const allDates = [...new Set([
-              ...normSp500.filter(p => p.date >= sp500From).map(p => p.date),
-              ...history.filter(h => h.date >= sp500From).map(h => h.date)
-            ])].sort();
+            const allDates = history
+              .filter(h => h.date >= sp500From)
+              .map(h => h.date)
+              .sort();
 
             let lastSp500Pct = null;
             const merged = allDates.map(date => {
