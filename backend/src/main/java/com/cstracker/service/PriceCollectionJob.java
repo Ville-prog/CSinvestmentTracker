@@ -83,6 +83,8 @@ public class PriceCollectionJob {
         int pricesCollected = 0;
 
         for (SteamItem steamItem : items) {
+            if (!steamItem.marketable()) continue;
+
             Item item = itemRepository.findByMarketHashName(steamItem.marketHashName())
                     .orElseGet(() -> {
                         Item newItem = new Item();
@@ -92,8 +94,6 @@ public class PriceCollectionJob {
                         newItem.setIconUrl(steamItem.iconUrl());
                         return itemRepository.save(newItem);
                     });
-
-            if (!steamItem.marketable()) continue;
 
             totalUnits += steamItem.amount();
 
