@@ -16,6 +16,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -77,10 +83,23 @@ public class PriceService {
         try {
             String encoded = URLEncoder.encode(marketHashName, StandardCharsets.UTF_8);
             String url = String.format(PRICE_URL, encoded);
-            SteamPriceResponse response = restTemplate.getForObject(url, SteamPriceResponse.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36");
+            headers.set("Accept", "application/json");
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            if (response == null || !response.isSuccess()) {
-                log.warn("No price data for '{}'", marketHashName);
+            log.debug("Fetching price for '{}'", marketHashName);
+            ResponseEntity<SteamPriceResponse> responseEntity = restTemplate.exchange(URI.create(url), HttpMethod.GET, entity, SteamPriceResponse.class);
+            SteamPriceResponse response = responseEntity.getBody();
+
+            if (response == null) {
+                log.warn("Null response for '{}'", marketHashName);
+                return 0.0;
+            }
+
+            if (!response.isSuccess()) {
+                log.warn("success=false for '{}' — median='{}' lowest='{}'",
+                        marketHashName, response.getMedianPrice(), response.getLowestPrice());
                 return 0.0;
             }
 
@@ -88,10 +107,12 @@ public class PriceService {
                     ? response.getMedianPrice()
                     : response.getLowestPrice();
 
-            return parsePrice(priceStr);
+            double parsed = parsePrice(priceStr);
+            log.debug("Fetched price for '{}': raw='{}' parsed={}", marketHashName, priceStr, parsed);
+            return parsed;
 
         } catch (Exception e) {
-            log.warn("Failed to fetch price for '{}': {}", marketHashName, e.getMessage());
+            log.warn("Exception fetching price for '{}': {} — {}", marketHashName, e.getClass().getSimpleName(), e.getMessage());
             return 0.0;
         }
     }
