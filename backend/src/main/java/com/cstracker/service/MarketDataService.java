@@ -77,7 +77,7 @@ public class MarketDataService {
             Map quote = (Map) quotes.get(0);
             List<Double> closes = (List<Double>) quote.get("close");
 
-            for (int i = 0; i < timestamps.size(); i++) {
+            for (int i = 0; i < Math.min(timestamps.size(), closes.size()); i++) {
                 Double close = closes.get(i);
                 if (close == null) continue;
                 LocalDate date = Instant.ofEpochSecond(timestamps.get(i).longValue())

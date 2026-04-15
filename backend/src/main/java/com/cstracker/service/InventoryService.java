@@ -17,7 +17,8 @@ import com.cstracker.repository.PriceRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryService {
@@ -39,30 +40,36 @@ public class InventoryService {
     /**
      * Returns all tracked items enriched with their latest price and P&L data.
      * Items with no price records or zero tracked quantity are excluded.
+     * Uses a single bulk query to fetch all latest prices, avoiding N+1 queries.
      *
      * @return list of InventoryItemView records sorted by total value descending
      */
     public List<InventoryItemView> getInventoryItems() {
-        return itemRepository.findAll().stream()
+        List<Item> items = itemRepository.findAll().stream()
                 .filter(item -> item.getTrackedQuantity() > 0)
-                .map(this::toView)
+                .toList();
+
+        Map<Long, Double> priceMap = priceRepository.findLatestPricesForItems(items).stream()
+                .collect(Collectors.toMap(p -> p.getItem().getId(), Price::getPriceEur));
+
+        return items.stream()
+                .map(item -> toView(item, priceMap.get(item.getId())))
                 .filter(view -> view != null)
                 .sorted((a, b) -> Double.compare(b.totalValueEur(), a.totalValueEur()))
                 .toList();
     }
 
     /**
-     * Converts an Item entity to an InventoryItemView by joining with its latest price record.
-     * Returns null if no price record exists for the item.
+     * Converts an Item entity to an InventoryItemView using the pre-fetched price.
+     * Returns null if no price is available for the item.
      *
-     * @param item the Item entity to convert
+     * @param item  the Item entity to convert
+     * @param price the latest price in EUR, or null if unavailable
      * @return an InventoryItemView with price and P&L data, or null if no price is available
      */
-    private InventoryItemView toView(Item item) {
-        Optional<Price> latestPrice = priceRepository.findTopByItemOrderByDateDesc(item);
-        if (latestPrice.isEmpty()) return null;
+    private InventoryItemView toView(Item item, Double price) {
+        if (price == null) return null;
 
-        double price = latestPrice.get().getPriceEur();
         int quantity = item.getTrackedQuantity();
         double totalValue = price * quantity;
         double costBasisPerUnit = item.getCostBasisEur() / quantity;

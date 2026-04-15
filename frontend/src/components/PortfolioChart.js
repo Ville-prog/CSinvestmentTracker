@@ -55,6 +55,7 @@ function normalize(dataPoints, valueKey) {
   const valid = dataPoints.filter(p => p[valueKey] != null);
   if (valid.length === 0) return [];
   const base = valid[0][valueKey];
+  if (base === 0) return [];
   return valid.map(p => ({
     date: p.date,
     pct: parseFloat((((p[valueKey] - base) / base) * 100).toFixed(2))

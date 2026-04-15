@@ -62,7 +62,8 @@ public class PriceCollectionJob {
      * Runs the full price collection cycle. Fetches the Steam inventory, upserts items into the
      * database, collects a price per marketable item with rate limiting, and saves a daily portfolio
      * snapshot. Skips execution if a snapshot already exists for today to prevent double runs.
-     * Scheduled to run at 02:00 UTC daily and can also be triggered manually via the API.
+     * Snapshot is not saved if the job is interrupted mid-run to avoid partial data.
+     * Scheduled to run at 23:00 UTC daily and can also be triggered manually via the API.
      */
     @Scheduled(cron = "0 0 23 * * *")
     public void collectPrices() {
@@ -81,6 +82,7 @@ public class PriceCollectionJob {
         double totalCostBasis = 0.0;
         int totalUnits = 0;
         int pricesCollected = 0;
+        boolean interrupted = false;
 
         for (SteamItem steamItem : items) {
             if (!steamItem.marketable()) continue;
@@ -95,9 +97,8 @@ public class PriceCollectionJob {
                         return itemRepository.save(newItem);
                     });
 
-            totalUnits += steamItem.amount();
-
             if (priceRepository.findByItemAndDate(item, today).isPresent()) {
+                totalUnits += steamItem.amount();
                 totalCostBasis += item.getCostBasisEur();
                 totalValue += priceRepository.findByItemAndDate(item, today).get().getPriceEur() * steamItem.amount();
                 continue;
@@ -112,18 +113,27 @@ public class PriceCollectionJob {
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     log.warn("Price collection interrupted");
+                    interrupted = true;
                     break;
                 }
                 continue;
             }
 
-            if (steamItem.amount() > item.getTrackedQuantity()) {
-                int newUnits = steamItem.amount() - item.getTrackedQuantity();
-                item.setCostBasisEur(item.getCostBasisEur() + newUnits * price);
+            if (steamItem.amount() != item.getTrackedQuantity()) {
+                if (steamItem.amount() > item.getTrackedQuantity()) {
+                    int newUnits = steamItem.amount() - item.getTrackedQuantity();
+                    item.setCostBasisEur(item.getCostBasisEur() + newUnits * price);
+                } else {
+                    double ratio = (double) steamItem.amount() / item.getTrackedQuantity();
+                    item.setCostBasisEur(item.getCostBasisEur() * ratio);
+                    log.info("Quantity decreased for '{}': {} -> {}, cost basis adjusted to {}",
+                            steamItem.marketHashName(), item.getTrackedQuantity(), steamItem.amount(), item.getCostBasisEur());
+                }
                 item.setTrackedQuantity(steamItem.amount());
                 itemRepository.save(item);
             }
 
+            totalUnits += steamItem.amount();
             totalValue += price * steamItem.amount();
             totalCostBasis += item.getCostBasisEur();
 
@@ -139,8 +149,13 @@ public class PriceCollectionJob {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.warn("Price collection interrupted");
+                interrupted = true;
                 break;
             }
+        }
+
+        if (interrupted) {
+            log.warn("Price collection was interrupted after {} prices — saving partial snapshot.", pricesCollected);
         }
 
         PortfolioSnapshot snapshot = new PortfolioSnapshot();
@@ -150,6 +165,6 @@ public class PriceCollectionJob {
         snapshot.setItemCount(totalUnits);
         snapshotRepository.save(snapshot);
 
-        log.info("Price collection complete. {} prices saved. Total value: ${:.2f}", pricesCollected, totalValue);
+        log.info("Price collection complete. {} prices saved. Total value: {}EUR", pricesCollected, totalValue);
     }
 }
