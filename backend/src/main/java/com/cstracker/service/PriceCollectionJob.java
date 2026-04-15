@@ -107,6 +107,13 @@ public class PriceCollectionJob {
 
             if (price <= 0.0) {
                 log.warn("Skipping price save for '{}' — received price={}", steamItem.marketHashName(), price);
+                try {
+                    Thread.sleep(RATE_LIMIT_DELAY_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.warn("Price collection interrupted");
+                    break;
+                }
                 continue;
             }
 
