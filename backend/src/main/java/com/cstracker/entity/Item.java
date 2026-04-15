@@ -43,6 +43,9 @@ public class Item {
     /** @return the auto-generated database primary key */
     public Long getId() { return id; }
 
+    /** @param id the database primary key, used for testing */
+    public void setId(Long id) { this.id = id; }
+
     /** @return the Steam class ID identifying this item type */
     public String getClassId() { return classId; }
 

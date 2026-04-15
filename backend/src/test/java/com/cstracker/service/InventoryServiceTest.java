@@ -37,8 +37,11 @@ class InventoryServiceTest {
     @InjectMocks
     InventoryService inventoryService;
 
+    private long nextId = 1;
+
     private Item makeItem(String name, double costBasis, int trackedQty) {
         Item item = new Item();
+        item.setId(nextId++);
         item.setMarketHashName(name);
         item.setName(name);
         item.setCostBasisEur(costBasis);
