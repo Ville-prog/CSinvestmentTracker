@@ -8,7 +8,6 @@
  */
 import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
-import Inventory from './pages/Inventory';
 import About from './pages/About';
 import './App.css';
 
@@ -29,12 +28,7 @@ function App() {
         >
           Dashboard
         </button>
-        <button
-          className={`nav-btn ${page === 'inventory' ? 'active' : ''}`}
-          onClick={() => setPage('inventory')}
-        >
-          Inventory
-        </button>
+
         <button
           className={`nav-btn ${page === 'about' ? 'active' : ''}`}
           onClick={() => setPage('about')}
@@ -44,7 +38,7 @@ function App() {
       </nav>
 
       {page === 'dashboard' && <Dashboard />}
-      {page === 'inventory' && <Inventory />}
+
       {page === 'about' && <About />}
     </div>
   );

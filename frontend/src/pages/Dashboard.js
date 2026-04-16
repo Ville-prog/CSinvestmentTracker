@@ -1,38 +1,40 @@
 /**
  * Dashboard.js
  *
- * Main dashboard page displaying the latest portfolio value snapshot and the portfolio chart.
- * Fetches the most recent snapshot from the backend on mount and passes it to child components.
+ * Main dashboard page displaying portfolio snapshot stats, charts, and the full inventory table.
+ * Fetches both the latest portfolio snapshot and inventory items on mount.
  *
  * @author Ville Laaksoaho
- * Dependencies: PortfolioChart.js, PortfolioValueChart.js, Dashboard.css
+ * Dependencies: PortfolioChart.js, PortfolioValueChart.js, InventoryTable.js, Dashboard.css
  */
 import { useEffect, useState } from 'react';
 import PortfolioChart from '../components/PortfolioChart';
 import PortfolioValueChart from '../components/PortfolioValueChart';
+import InventoryTable from '../components/InventoryTable';
 import './Dashboard.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 /**
- * @brief Fetches and displays the latest portfolio snapshot including total value, item count, and chart.
+ * @brief Fetches and displays portfolio snapshot stats, charts, and the sortable inventory table.
  *
- * @returns {JSX.Element} The dashboard page with stat cards and portfolio chart
+ * @returns {JSX.Element} The dashboard page with stat cards, charts, and inventory table
  */
 function Dashboard() {
   const [snapshot, setSnapshot] = useState(null);
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [chartView, setChartView] = useState('performance');
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/portfolio/latest`)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch portfolio data');
-        return res.json();
-      })
-      .then(data => {
-        setSnapshot(data);
+    Promise.all([
+      fetch(`${API_BASE}/api/portfolio/latest`).then(r => r.ok ? r.json() : null),
+      fetch(`${API_BASE}/api/inventory/items`).then(r => r.ok ? r.json() : [])
+    ])
+      .then(([snapshotData, itemsData]) => {
+        setSnapshot(snapshotData);
+        setItems(itemsData);
         setLoading(false);
       })
       .catch(err => {
@@ -43,40 +45,58 @@ function Dashboard() {
 
   if (loading) return <p className="status-text">Loading...</p>;
   if (error) return <p className="status-text error">{error}</p>;
-  if (!snapshot) return <p className="status-text">No data yet. The nightly job has not run yet.</p>;
+
+  const totalValue = items.reduce((sum, item) => sum + item.totalValueEur, 0);
+  const totalUnits = items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div className="dashboard">
       <h1 className="page-title">CS2 Portfolio</h1>
-      <p className="snapshot-date">Last updated: {snapshot.date.split('-').reverse().join('.')}</p>
+      {snapshot && (
+        <p className="snapshot-date">Last updated: {snapshot.date.split('-').reverse().join('.')}</p>
+      )}
 
       <div className="stat-cards">
         <div className="stat-card">
           <span className="stat-label">Total Value</span>
-          <span className="stat-value">€{snapshot.totalValueEur.toFixed(2)}</span>
+          <span className="stat-value">€{totalValue.toFixed(2)}</span>
+        </div>
+        <div className="stat-card">
+          <span className="stat-label">Unique Items</span>
+          <span className="stat-value">{items.length}</span>
         </div>
         <div className="stat-card">
           <span className="stat-label">Total Units</span>
-          <span className="stat-value">{snapshot.itemCount}</span>
+          <span className="stat-value">{totalUnits}</span>
         </div>
       </div>
 
-      <div className="chart-tabs">
-        <button
-          className={`chart-tab ${chartView === 'performance' ? 'active' : ''}`}
-          onClick={() => setChartView('performance')}
-        >
-          P&L %
-        </button>
-        <button
-          className={`chart-tab ${chartView === 'value' ? 'active' : ''}`}
-          onClick={() => setChartView('value')}
-        >
-          Total Value
-        </button>
-      </div>
+      {snapshot && (
+        <>
+          <div className="chart-tabs">
+            <button
+              className={`chart-tab ${chartView === 'performance' ? 'active' : ''}`}
+              onClick={() => setChartView('performance')}
+            >
+              P&L %
+            </button>
+            <button
+              className={`chart-tab ${chartView === 'value' ? 'active' : ''}`}
+              onClick={() => setChartView('value')}
+            >
+              Total Value
+            </button>
+          </div>
+          {chartView === 'performance' ? <PortfolioChart /> : <PortfolioValueChart />}
+        </>
+      )}
 
-      {chartView === 'performance' ? <PortfolioChart /> : <PortfolioValueChart />}
+      {items.length > 0 && (
+        <>
+          <h2 className="section-title">Inventory</h2>
+          <InventoryTable items={items} />
+        </>
+      )}
     </div>
   );
 }

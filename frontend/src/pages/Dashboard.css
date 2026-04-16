@@ -77,6 +77,13 @@
   padding: 24px 16px 16px;
 }
 
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: -8px;
+}
+
 .status-text {
   color: #888;
   margin-top: 32px;

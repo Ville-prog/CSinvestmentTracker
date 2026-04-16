@@ -101,6 +101,10 @@ public class PriceCollectionJob {
                 totalUnits += steamItem.amount();
                 totalCostBasis += item.getCostBasisEur();
                 totalValue += priceRepository.findByItemAndDate(item, today).get().getPriceEur() * steamItem.amount();
+                if (steamItem.amount() != item.getTrackedQuantity()) {
+                    item.setTrackedQuantity(steamItem.amount());
+                    itemRepository.save(item);
+                }
                 continue;
             }
 

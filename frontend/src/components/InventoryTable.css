@@ -72,6 +72,16 @@
   text-overflow: ellipsis;
 }
 
+.name-cell a {
+  color: #e0e0e0;
+  text-decoration: none;
+}
+
+.name-cell a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
 .positive {
   color: #4caf50;
 }
