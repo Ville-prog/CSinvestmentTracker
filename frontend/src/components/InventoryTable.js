@@ -96,7 +96,15 @@ function InventoryTable({ items }) {
                   />
                 )}
               </td>
-              <td className="name-cell">{item.name}</td>
+              <td className="name-cell">
+                <a
+                  href={`https://steamcommunity.com/market/listings/730/${encodeURIComponent(item.marketHashName)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {item.name}
+                </a>
+              </td>
               <td>{item.quantity}</td>
               <td>€{item.priceEur.toFixed(2)}</td>
               <td>€{item.totalValueEur.toFixed(2)}</td>
