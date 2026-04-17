@@ -21,7 +21,13 @@ That said, individual items can be volatile. **The market behaves more like an i
 
 ## How it works
 
-A nightly job runs at 11 PM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time. A portfolio snapshot (total value + item count) is also saved each night.
+A nightly job runs at 11 PM UTC and is split into two stages. First, it fetches the Steam inventory and upserts any newly discovered items into the database. Second, it collects the current Steam Market price for **every tracked item in the database**, not only the items returned by today's Steam response. Prices are saved daily, building a historical record over time, and a portfolio snapshot (total value, total cost basis, unit count) is saved at the end of each run.
+
+This two-stage design absorbs transient gaps in Steam's inventory response. If Steam temporarily returns fewer items than expected (truncation, rate limits, or silent filtering), tracked items still get priced from the DB and the portfolio value stays accurate.
+
+### Detecting traded-away items
+
+Because pricing is driven by the DB rather than the Steam response, the app needs a separate way to know when an item has actually been traded away. Each item carries a `last_seen_in_steam` timestamp that is advanced every time the item appears in a sane Steam response. Items whose last-seen timestamp falls outside a 7-day grace window are considered traded away and their tracked quantity is set to zero. A sanity gate further guards the process: if today's Steam response is below 50% of the recent 7-day maximum unit count, the run is treated as degraded — prices are still fetched, but `last_seen` and `trackedQuantity` are not touched so one bad Steam day cannot falsely age out the entire inventory.
 
 ## Pages
 
@@ -35,7 +41,7 @@ Tracks total portfolio value trough two different charts:
 P&L % = (current value - cost basis) / cost basis * 100
 ```
 
-Each item's cost basis is set to its market price on the day it first becomes available for sale. **This means the chart only moves when prices change, adding new items to the inventory does not affect the P&L line.** This mirrors how real investment portfolio trackers work: buying new shares increases your portfolio value, but does not count as a gain. Only price appreciation of what you already hold moves the return percentage.
+When the tracked quantity of an existing item increases (new units acquired), those new units are added to the cost basis at today's market price. When it decreases (units sold), the cost basis is scaled proportionally. Items seen for the very first time default to a cost basis of zero — today's price is not a valid proxy for the original acquisition cost of a pre-existing stack, so the initial cost basis must be set manually in the database. **This means the chart only moves when prices change; adding new items to the inventory does not affect the P&L line.** This mirrors how real investment portfolio trackers work: buying new shares increases your portfolio value, but does not count as a gain. Only price appreciation of what you already hold moves the return percentage.
 
 **2. Total Value:** Raw portfolio value in EUR over time. Unlike the P&L chart, this reflects absolute value including the effect of adding new items to the inventory.
 
@@ -55,7 +61,7 @@ This app currently only works for a single, hardcoded Steam inventory (mine). Th
 - There is no official API for real-time CS2 market prices
 - Many third-party sites bypass these limits by running large networks of Steam bot accounts that scrape data continuously, which violates Steam's Terms of Service
 
-This app takes the compliant approach: a nightly price collection job that respects rate limits (one request every 129 seconds). This works well in practice because CS2 skin prices don't fluctuate significantly day-to-day, making daily snapshots sufficient for investment tracking.
+This app takes the compliant approach: a nightly price collection job that respects rate limits (one request every 4 seconds). This works well in practice because CS2 skin prices don't fluctuate significantly day-to-day, making daily snapshots sufficient for investment tracking.
 
 ## Stack
 
@@ -87,3 +93,5 @@ CSinvestmentTracker/
 - **Storage Containers:** Steam's inventory API only exposes the base inventory (up to 1000 slots). Items stored inside Storage Containers are not visible to the API and cannot be tracked. Items must be moved to the base inventory to be included.
 - **Trade cooldowns:** Newly traded items have a 7-day market cooldown during which they appear as non-marketable and are skipped by the price collection job.
 - **Single inventory:** The app currently tracks only one hardcoded Steam inventory. A future improvement could allow multiple Steam IDs to be registered, each with their own nightly price collection and portfolio history, though this would require careful rate limit management across all tracked inventories.
+- **Initial cost basis:** Items seen for the first time default to a zero cost basis, since the market price on the day they are discovered does not reflect their actual acquisition cost. The cost basis for pre-existing items must be backfilled manually.
+- **Trade-out detection delay:** Because the app continues to price items that are not in a given Steam response (to absorb API gaps), truly traded-away items are only recognised after 7 consecutive days outside the inventory response.

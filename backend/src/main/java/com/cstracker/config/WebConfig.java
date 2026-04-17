@@ -10,9 +10,12 @@ package com.cstracker.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.time.Duration;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -33,11 +36,15 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * Provides a shared RestTemplate bean used for outbound HTTP calls to the Steam API.
+     * Connect and read timeouts prevent the nightly job from hanging indefinitely on a stalled Steam connection.
      *
-     * @return a default RestTemplate instance
+     * @return a RestTemplate with bounded connect and read timeouts
      */
     @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplate();
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout((int) Duration.ofSeconds(10).toMillis());
+        factory.setReadTimeout((int) Duration.ofSeconds(30).toMillis());
+        return new RestTemplate(factory);
     }
 }

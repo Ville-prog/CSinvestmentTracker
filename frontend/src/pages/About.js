@@ -32,15 +32,16 @@ function About() {
 
       <div className="about-section">
         <h2 className="about-heading">How it works</h2>
-        <p>A nightly job runs at 11 PM UTC, fetches the Steam inventory, and collects current Steam Market prices for each item. Prices are saved to the database daily, building a historical record over time.</p>
-        <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 129 seconds. This is the compliant approach. Many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
+        <p>A nightly job runs at 11 PM UTC and fetches the Steam inventory, upserting any newly discovered items into the database. It then collects the current Steam Market price for every tracked item in the database — not only the items returned by today's Steam response — so transient gaps or truncations in the Steam API don't distort the portfolio value.</p>
+        <p>Each item carries a last-seen timestamp that is advanced whenever it appears in a sane Steam response. Items missing for more than 7 days are considered traded away, and a sanity gate protects against one bad Steam day silently ageing out the whole inventory.</p>
+        <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 4 seconds. This is the compliant approach. Many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
       </div>
 
       <div className="about-section">
         <h2 className="about-heading">P&L calculation</h2>
         <p>Portfolio profit/loss is calculated relative to cost basis:</p>
         <pre className="about-formula">P&L % = (current value − cost basis) / cost basis × 100</pre>
-        <p>Each item's cost basis is set to its market price on the day it first becomes available for sale. This means the chart only moves when prices change. Adding new items does not count as a gain. This mirrors how real investment portfolio trackers work.</p>
+        <p>When new units of an item are added to the tracked inventory, they enter the cost basis at today's market price. When units are sold, the cost basis is scaled proportionally. Items seen for the first time default to a zero cost basis — today's price is not a valid stand-in for the actual acquisition cost of a pre-existing stack, so the initial value is backfilled manually. This means the chart only moves when prices change; adding items does not count as a gain. It mirrors how real investment portfolio trackers work.</p>
       </div>
 
       <div className="about-section">
@@ -59,6 +60,8 @@ function About() {
           <li><strong>Storage Containers:</strong> Items stored inside Steam Storage Containers are not visible to the API and cannot be tracked.</li>
           <li><strong>Trade cooldowns:</strong> Newly traded items have a 7-day market cooldown and are skipped until they become marketable.</li>
           <li><strong>Single inventory:</strong> The app currently tracks one hardcoded Steam inventory.</li>
+          <li><strong>Initial cost basis:</strong> Items discovered for the first time start at a zero cost basis and must be backfilled manually.</li>
+          <li><strong>Trade-out detection delay:</strong> Since items missing from a single Steam response are still priced from the DB, truly traded-away items are only recognised after 7 consecutive days outside the inventory response.</li>
         </ul>
       </div>
     </div>

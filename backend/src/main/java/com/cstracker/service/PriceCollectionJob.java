@@ -1,8 +1,11 @@
 /**
  * PriceCollectionJob.java
  *
- * Scheduled nightly job that collects Steam Market prices for all items in the tracked inventory.
- * Upserts items into the database, saves daily price records, and creates a portfolio value snapshot.
+ * Scheduled nightly job that collects Steam Market prices for all tracked items and records
+ * a daily portfolio snapshot. Uses a last-seen timestamp on each item and a sanity gate on the
+ * Steam response to absorb transient API gaps — prices are fetched for every tracked item in the
+ * database, not only the items returned by today's Steam call, and items unseen for more than
+ * the grace window are treated as traded away.
  *
  * @author Ville Laaksoaho
  */
@@ -22,13 +25,34 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class PriceCollectionJob {
 
     private static final Logger log = LoggerFactory.getLogger(PriceCollectionJob.class);
-    private static final int RATE_LIMIT_DELAY_MS = 129000;
+
+    /** Number of days an item can be missing from Steam responses before it is considered traded away. */
+    static final int GRACE_DAYS = 7;
+
+    /**
+     * Minimum fraction of the recent max item_count that today's Steam response must reach
+     * to be treated as sane. Below this, the run is degraded: prices are still fetched for
+     * tracked items, but last_seen and trackedQuantity are not touched so a bad Steam day
+     * cannot falsely age out the entire inventory.
+     */
+    static final double SANITY_THRESHOLD = 0.5;
+
+    /** Lookback window for the sanity baseline. */
+    static final int SANITY_LOOKBACK_DAYS = 7;
+
+    int rateLimitDelayMs = 4000;
 
     private final SteamApiService steamApiService;
     private final PriceService priceService;
@@ -59,11 +83,17 @@ public class PriceCollectionJob {
     }
 
     /**
-     * Runs the full price collection cycle. Fetches the Steam inventory, upserts items into the
-     * database, collects a price per marketable item with rate limiting, and saves a daily portfolio
-     * snapshot. Skips execution if a snapshot already exists for today to prevent double runs.
-     * Snapshot is not saved if the job is interrupted mid-run to avoid partial data.
-     * Scheduled to run at 23:00 UTC daily and can also be triggered manually via the API.
+     * Runs the full price collection cycle:
+     * <ol>
+     *   <li>Fetches the Steam inventory and validates it against a sanity baseline.</li>
+     *   <li>Upserts any newly discovered items into the database.</li>
+     *   <li>On a sane response, updates last_seen and ages out items missing for more than {@link #GRACE_DAYS} days.</li>
+     *   <li>Fetches today's price for every currently tracked item (not only items in today's response).</li>
+     *   <li>Reconciles quantity and cost basis for items that appear in today's response with a different quantity.</li>
+     *   <li>Saves a portfolio snapshot summarising total value, cost basis, and units.</li>
+     * </ol>
+     * Skips execution entirely if a snapshot already exists for today or if the Steam response is empty.
+     * Scheduled at 23:00 UTC daily and can also be invoked manually via the admin endpoint.
      */
     @Scheduled(cron = "0 0 23 * * *")
     public void collectPrices() {
@@ -75,100 +105,206 @@ public class PriceCollectionJob {
             return;
         }
 
-        List<SteamItem> items = steamApiService.getInventory(steamUserId);
-        log.info("Fetched {} items from inventory", items.size());
+        List<SteamItem> steamItems = steamApiService.getInventory(steamUserId);
+        log.info("Fetched {} items from Steam inventory response", steamItems.size());
 
-        double totalValue = 0.0;
-        double totalCostBasis = 0.0;
-        int totalUnits = 0;
-        int pricesCollected = 0;
-        boolean interrupted = false;
-
-        for (SteamItem steamItem : items) {
-            if (!steamItem.marketable()) continue;
-
-            Item item = itemRepository.findByMarketHashName(steamItem.marketHashName())
-                    .orElseGet(() -> {
-                        Item newItem = new Item();
-                        newItem.setMarketHashName(steamItem.marketHashName());
-                        newItem.setName(steamItem.name());
-                        newItem.setClassId(steamItem.classId());
-                        newItem.setIconUrl(steamItem.iconUrl());
-                        return itemRepository.save(newItem);
-                    });
-
-            if (priceRepository.findByItemAndDate(item, today).isPresent()) {
-                totalUnits += steamItem.amount();
-                totalCostBasis += item.getCostBasisEur();
-                totalValue += priceRepository.findByItemAndDate(item, today).get().getPriceEur() * steamItem.amount();
-                if (steamItem.amount() != item.getTrackedQuantity()) {
-                    item.setTrackedQuantity(steamItem.amount());
-                    itemRepository.save(item);
-                }
-                continue;
-            }
-
-            double price = priceService.fetchPrice(steamItem.marketHashName());
-
-            if (price <= 0.0) {
-                log.warn("Skipping price save for '{}' — received price={}", steamItem.marketHashName(), price);
-                try {
-                    Thread.sleep(RATE_LIMIT_DELAY_MS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    log.warn("Price collection interrupted");
-                    interrupted = true;
-                    break;
-                }
-                continue;
-            }
-
-            if (steamItem.amount() != item.getTrackedQuantity()) {
-                if (steamItem.amount() > item.getTrackedQuantity()) {
-                    int newUnits = steamItem.amount() - item.getTrackedQuantity();
-                    item.setCostBasisEur(item.getCostBasisEur() + newUnits * price);
-                } else {
-                    double ratio = (double) steamItem.amount() / item.getTrackedQuantity();
-                    item.setCostBasisEur(item.getCostBasisEur() * ratio);
-                    log.info("Quantity decreased for '{}': {} -> {}, cost basis adjusted to {}",
-                            steamItem.marketHashName(), item.getTrackedQuantity(), steamItem.amount(), item.getCostBasisEur());
-                }
-                item.setTrackedQuantity(steamItem.amount());
-                itemRepository.save(item);
-            }
-
-            totalUnits += steamItem.amount();
-            totalValue += price * steamItem.amount();
-            totalCostBasis += item.getCostBasisEur();
-
-            Price priceRecord = new Price();
-            priceRecord.setItem(item);
-            priceRecord.setDate(today);
-            priceRecord.setPriceEur(price);
-            priceRepository.save(priceRecord);
-            pricesCollected++;
-
-            try {
-                Thread.sleep(RATE_LIMIT_DELAY_MS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.warn("Price collection interrupted");
-                interrupted = true;
-                break;
-            }
+        if (steamItems.isEmpty()) {
+            log.warn("Steam inventory returned empty — skipping snapshot save for {} to avoid poisoning the chart.", today);
+            return;
         }
 
-        if (interrupted) {
-            log.warn("Price collection was interrupted after {} prices — saving partial snapshot.", pricesCollected);
+        int responseUnits = steamItems.stream()
+                .filter(SteamItem::marketable)
+                .mapToInt(SteamItem::amount)
+                .sum();
+        boolean sane = isResponseSane(responseUnits, today);
+        if (!sane) {
+            log.warn("Steam response ({} marketable units) is below the sanity threshold against the " +
+                    "{}-day baseline. Treating run as degraded: prices will be fetched for all tracked " +
+                    "items in the DB, but last_seen and trackedQuantity will NOT be updated.",
+                    responseUnits, SANITY_LOOKBACK_DAYS);
+        }
+
+        Map<String, SteamItem> responseByHash = new HashMap<>();
+        for (SteamItem s : steamItems) {
+            if (!s.marketable()) continue;
+            responseByHash.put(s.marketHashName(), s);
+            itemRepository.findByMarketHashName(s.marketHashName())
+                    .orElseGet(() -> createNewItem(s));
+        }
+
+        if (sane) {
+            markItemsSeen(responseByHash.keySet(), today);
+            ageOutStaleItems(today);
+        }
+
+        List<Item> candidates = gatherPricingCandidates(responseByHash, sane);
+        log.info("Pricing {} candidate items ({} from Steam response, sane={}).",
+                candidates.size(), responseByHash.size(), sane);
+
+        CollectionTotals totals = priceCandidates(candidates, responseByHash, sane, today);
+
+        if (totals.interrupted) {
+            log.warn("Price collection was interrupted after {} prices — saving partial snapshot.", totals.pricesCollected);
         }
 
         PortfolioSnapshot snapshot = new PortfolioSnapshot();
         snapshot.setDate(today);
-        snapshot.setTotalValueEur(totalValue);
-        snapshot.setTotalCostBasisEur(totalCostBasis);
-        snapshot.setItemCount(totalUnits);
+        snapshot.setTotalValueEur(totals.totalValue);
+        snapshot.setTotalCostBasisEur(totals.totalCostBasis);
+        snapshot.setItemCount(totals.totalUnits);
         snapshotRepository.save(snapshot);
 
-        log.info("Price collection complete. {} prices saved. Total value: {}EUR", pricesCollected, totalValue);
+        log.info("Price collection complete. {} new prices saved. Total value: {}EUR across {} units.",
+                totals.pricesCollected, totals.totalValue, totals.totalUnits);
+    }
+
+    private boolean isResponseSane(int responseUnits, LocalDate today) {
+        Integer maxRecent = snapshotRepository.findMaxItemCountSince(today.minusDays(SANITY_LOOKBACK_DAYS));
+        if (maxRecent == null || maxRecent == 0) {
+            return true;
+        }
+        return responseUnits >= (int) Math.floor(maxRecent * SANITY_THRESHOLD);
+    }
+
+    private Item createNewItem(SteamItem s) {
+        Item item = new Item();
+        item.setMarketHashName(s.marketHashName());
+        item.setName(s.name());
+        item.setClassId(s.classId());
+        item.setIconUrl(s.iconUrl());
+        return itemRepository.save(item);
+    }
+
+    private void markItemsSeen(Set<String> hashesInResponse, LocalDate today) {
+        for (String hash : hashesInResponse) {
+            itemRepository.findByMarketHashName(hash).ifPresent(item -> {
+                item.setLastSeenInSteam(today);
+                itemRepository.save(item);
+            });
+        }
+    }
+
+    private void ageOutStaleItems(LocalDate today) {
+        LocalDate cutoff = today.minusDays(GRACE_DAYS);
+        List<Item> aged = itemRepository.findByTrackedQuantityGreaterThan(0).stream()
+                .filter(i -> i.getLastSeenInSteam() != null && i.getLastSeenInSteam().isBefore(cutoff))
+                .toList();
+        for (Item item : aged) {
+            log.info("Ageing out '{}' — last seen in Steam on {} (more than {} days ago).",
+                    item.getMarketHashName(), item.getLastSeenInSteam(), GRACE_DAYS);
+            item.setTrackedQuantity(0);
+            itemRepository.save(item);
+        }
+    }
+
+    private List<Item> gatherPricingCandidates(Map<String, SteamItem> responseByHash, boolean sane) {
+        List<Item> candidates = new ArrayList<>(itemRepository.findByTrackedQuantityGreaterThan(0));
+        if (!sane) {
+            return candidates;
+        }
+        Set<Long> existingIds = new HashSet<>();
+        for (Item item : candidates) existingIds.add(item.getId());
+        for (String hash : responseByHash.keySet()) {
+            itemRepository.findByMarketHashName(hash).ifPresent(item -> {
+                if (!existingIds.contains(item.getId())) {
+                    candidates.add(item);
+                    existingIds.add(item.getId());
+                }
+            });
+        }
+        return candidates;
+    }
+
+    private CollectionTotals priceCandidates(List<Item> candidates, Map<String, SteamItem> responseByHash,
+                                             boolean sane, LocalDate today) {
+        CollectionTotals totals = new CollectionTotals();
+        for (Item item : candidates) {
+            Optional<Price> existingPrice = priceRepository.findByItemAndDate(item, today);
+            double price;
+            boolean newPrice = existingPrice.isEmpty();
+            if (newPrice) {
+                price = priceService.fetchPrice(item.getMarketHashName());
+                if (price <= 0.0) {
+                    log.warn("Skipping price save for '{}' — received price={}", item.getMarketHashName(), price);
+                    if (sleep()) {
+                        totals.interrupted = true;
+                        return totals;
+                    }
+                    continue;
+                }
+            } else {
+                price = existingPrice.get().getPriceEur();
+            }
+
+            if (sane) {
+                reconcileQuantity(item, responseByHash.get(item.getMarketHashName()), price);
+            }
+
+            if (item.getTrackedQuantity() == 0) {
+                if (newPrice && sleep()) {
+                    totals.interrupted = true;
+                    return totals;
+                }
+                continue;
+            }
+
+            if (newPrice) {
+                Price priceRecord = new Price();
+                priceRecord.setItem(item);
+                priceRecord.setDate(today);
+                priceRecord.setPriceEur(price);
+                priceRepository.save(priceRecord);
+                totals.pricesCollected++;
+                if (sleep()) {
+                    totals.interrupted = true;
+                    return totals;
+                }
+            }
+
+            totals.totalUnits += item.getTrackedQuantity();
+            totals.totalValue += price * item.getTrackedQuantity();
+            totals.totalCostBasis += item.getCostBasisEur();
+        }
+        return totals;
+    }
+
+    private void reconcileQuantity(Item item, SteamItem fromSteam, double price) {
+        if (fromSteam == null || fromSteam.amount() == item.getTrackedQuantity()) {
+            return;
+        }
+        int prior = item.getTrackedQuantity();
+        if (prior > 0 && fromSteam.amount() > prior) {
+            int newUnits = fromSteam.amount() - prior;
+            item.setCostBasisEur(item.getCostBasisEur() + newUnits * price);
+        } else if (prior > 0 && fromSteam.amount() < prior) {
+            double ratio = (double) fromSteam.amount() / prior;
+            item.setCostBasisEur(item.getCostBasisEur() * ratio);
+            log.info("Quantity decreased for '{}': {} -> {}, cost basis adjusted to {}",
+                    item.getMarketHashName(), prior, fromSteam.amount(), item.getCostBasisEur());
+        }
+        // prior == 0: first-see. Leave cost basis at 0 for manual backfill — today's market price
+        // is not a valid proxy for the actual acquisition cost of a pre-existing item.
+        item.setTrackedQuantity(fromSteam.amount());
+        itemRepository.save(item);
+    }
+
+    private boolean sleep() {
+        try {
+            Thread.sleep(rateLimitDelayMs);
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Price collection interrupted");
+            return true;
+        }
+    }
+
+    private static final class CollectionTotals {
+        double totalValue;
+        double totalCostBasis;
+        int totalUnits;
+        int pricesCollected;
+        boolean interrupted;
     }
 }

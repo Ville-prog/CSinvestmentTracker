@@ -9,6 +9,7 @@
 package com.cstracker.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 /**
  * Represents a unique CS2 skin item tracked in the system.
@@ -39,6 +40,9 @@ public class Item {
 
     @Column(name = "tracked_quantity")
     private Integer trackedQuantity;
+
+    @Column(name = "last_seen_in_steam")
+    private LocalDate lastSeenInSteam;
 
     /** @return the auto-generated database primary key */
     public Long getId() { return id; }
@@ -81,4 +85,10 @@ public class Item {
 
     /** @param trackedQuantity the number of units for which a cost basis has been recorded */
     public void setTrackedQuantity(int trackedQuantity) { this.trackedQuantity = trackedQuantity; }
+
+    /** @return the most recent date this item appeared in a sane Steam inventory response, or null if never seen */
+    public LocalDate getLastSeenInSteam() { return lastSeenInSteam; }
+
+    /** @param lastSeenInSteam the most recent date this item appeared in a sane Steam inventory response */
+    public void setLastSeenInSteam(LocalDate lastSeenInSteam) { this.lastSeenInSteam = lastSeenInSteam; }
 }

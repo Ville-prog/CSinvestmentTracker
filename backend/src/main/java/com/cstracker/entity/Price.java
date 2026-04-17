@@ -49,9 +49,9 @@ public class Price {
     /** @param date the date this price was recorded */
     public void setDate(LocalDate date) { this.date = date; }
 
-    /** @return the Steam Market median price in USD for this item on this date */
+    /** @return the Steam Market median price in EUR for this item on this date */
     public double getPriceEur() { return priceEur; }
 
-    /** @param priceEur the Steam Market median price in USD for this item on this date */
+    /** @param priceEur the Steam Market median price in EUR for this item on this date */
     public void setPriceEur(double priceEur) { this.priceEur = priceEur; }
 }

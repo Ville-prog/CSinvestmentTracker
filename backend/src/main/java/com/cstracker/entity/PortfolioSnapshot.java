@@ -44,10 +44,10 @@ public class PortfolioSnapshot {
     /** @param date the date this snapshot was recorded */
     public void setDate(LocalDate date) { this.date = date; }
 
-    /** @return the estimated total market value of all tracked items in USD */
+    /** @return the estimated total market value of all tracked items in EUR */
     public double getTotalValueEur() { return totalValueEur; }
 
-    /** @param totalValueEur the estimated total market value of all tracked items in USD */
+    /** @param totalValueEur the estimated total market value of all tracked items in EUR */
     public void setTotalValueEur(double totalValueEur) { this.totalValueEur = totalValueEur; }
 
     /** @return the number of items in the inventory on this date */

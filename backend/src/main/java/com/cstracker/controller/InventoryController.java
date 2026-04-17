@@ -71,7 +71,7 @@ public class InventoryController {
      * GET /api/inventory/{steamId}/value
      *
      * @param steamId the 64-bit Steam ID of the target user
-     * @return InventoryValue with item count, total USD value, and priced item list
+     * @return InventoryValue with item count, total EUR value, and priced item list
      */
     @GetMapping("/{steamId}/value")
     public InventoryValue getInventoryValue(@PathVariable String steamId) {
