@@ -10,7 +10,7 @@
  */
 import { useEffect, useState } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip,
+  AreaChart, Area, Line, XAxis, YAxis, Tooltip,
   ResponsiveContainer, ReferenceLine, Legend, CartesianGrid
 } from 'recharts';
 import './PortfolioChart.css';
@@ -190,7 +190,13 @@ function PortfolioChart() {
         <p className="status-text">No market data available.</p>
       ) : (
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
+          <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#4f9eff" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#4f9eff" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
@@ -222,8 +228,8 @@ function PortfolioChart() {
             <CartesianGrid stroke="#222" strokeDasharray="3 3" vertical={false} />
             <ReferenceLine y={0} stroke="#333" strokeDasharray="3 3" />
             {showSp500 && <Line type="monotone" dataKey="sp500" stroke="#f0c040" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />}
-            <Line type="monotone" dataKey="portfolio" stroke="#4f9eff" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />
-          </LineChart>
+            <Area type="monotone" dataKey="portfolio" stroke="#4f9eff" strokeWidth={2} fill="url(#portfolioGradient)" dot={false} activeDot={{ r: 4 }} connectNulls />
+          </AreaChart>
         </ResponsiveContainer>
       )}
     </div>

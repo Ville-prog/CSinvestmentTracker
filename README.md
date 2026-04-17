@@ -6,9 +6,7 @@ A personal CS2 skin investment tracker that records the daily market value of a 
 
 [csinvestmenttracker.vercel.app](https://csinvestmenttracker.vercel.app/)
 
-Read-only view of my personal inventory, updated nightly at 23:00 UTC.
-
-
+Read-only view of my personal inventory.
 
 ## What is the CS2 skin market?
 
@@ -38,8 +36,6 @@ Many third-party tracker sites work around these by running networks of Steam bo
 The nightly job runs at 11 PM UTC in two stages. First, it fetches the Steam inventory and upserts any newly discovered items into the database. Second, it collects the current Steam Market price for **every tracked item in the database**, not only the items returned by today's Steam response. Prices are saved daily, building a historical record over time, and a portfolio snapshot (total value, total cost basis, unit count) is saved at the end of each run.
 
 Because pricing is driven by the DB rather than the Steam response, transient gaps don't distort the chart: tracked items still get priced even on days Steam returns fewer of them. Items missing from Steam for more than 7 consecutive days are considered traded away.
-
-Prices are Steam Market **median sale prices in EUR**, fetched with `currency=3` so no FX conversion is applied on our side.
 
 ## P&L calculation
 

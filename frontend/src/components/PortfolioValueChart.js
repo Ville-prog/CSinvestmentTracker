@@ -10,7 +10,7 @@
  */
 import { useEffect, useState } from 'react';
 import {
-  LineChart, Line, XAxis, YAxis, Tooltip,
+  AreaChart, Area, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid
 } from 'recharts';
 import './PortfolioChart.css';
@@ -118,7 +118,13 @@ function PortfolioValueChart() {
         <p className="status-text">No portfolio data available.</p>
       ) : (
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
+          <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#4f9eff" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="#4f9eff" stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
@@ -141,8 +147,8 @@ function PortfolioValueChart() {
               labelStyle={{ color: '#888' }}
             />
             <CartesianGrid stroke="#222" strokeDasharray="3 3" vertical={false} />
-            <Line type="monotone" dataKey="value" stroke="#4f9eff" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-          </LineChart>
+            <Area type="monotone" dataKey="value" stroke="#4f9eff" strokeWidth={2} fill="url(#valueGradient)" dot={false} activeDot={{ r: 4 }} />
+          </AreaChart>
         </ResponsiveContainer>
       )}
     </div>
