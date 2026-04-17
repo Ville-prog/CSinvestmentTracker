@@ -57,7 +57,7 @@ function formatDate(dateStr) {
 
 /**
  * @brief Chart component that fetches portfolio history and renders total EUR value over time.
- *        Includes time range selector buttons. Does not normalize data — shows absolute values.
+ *        Includes time range selector buttons. Does not normalize data; shows absolute values.
  *
  * @returns {JSX.Element} The portfolio total value chart with range buttons
  */

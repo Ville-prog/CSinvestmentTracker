@@ -3,7 +3,7 @@
  *
  * Scheduled nightly job that collects Steam Market prices for all tracked items and records
  * a daily portfolio snapshot. Uses a last-seen timestamp on each item and a sanity gate on the
- * Steam response to absorb transient API gaps — prices are fetched for every tracked item in the
+ * Steam response to absorb transient API gaps: prices are fetched for every tracked item in the
  * database, not only the items returned by today's Steam call, and items unseen for more than
  * the grace window are treated as traded away.
  *
@@ -109,7 +109,7 @@ public class PriceCollectionJob {
         log.info("Fetched {} items from Steam inventory response", steamItems.size());
 
         if (steamItems.isEmpty()) {
-            log.warn("Steam inventory returned empty — skipping snapshot save for {} to avoid poisoning the chart.", today);
+            log.warn("Steam inventory returned empty, skipping snapshot save for {} to avoid poisoning the chart.", today);
             return;
         }
 
@@ -145,7 +145,7 @@ public class PriceCollectionJob {
         CollectionTotals totals = priceCandidates(candidates, responseByHash, sane, today);
 
         if (totals.interrupted) {
-            log.warn("Price collection was interrupted after {} prices — saving partial snapshot.", totals.pricesCollected);
+            log.warn("Price collection was interrupted after {} prices, saving partial snapshot.", totals.pricesCollected);
         }
 
         PortfolioSnapshot snapshot = new PortfolioSnapshot();
@@ -191,7 +191,7 @@ public class PriceCollectionJob {
                 .filter(i -> i.getLastSeenInSteam() != null && i.getLastSeenInSteam().isBefore(cutoff))
                 .toList();
         for (Item item : aged) {
-            log.info("Ageing out '{}' — last seen in Steam on {} (more than {} days ago).",
+            log.info("Ageing out '{}', last seen in Steam on {} (more than {} days ago).",
                     item.getMarketHashName(), item.getLastSeenInSteam(), GRACE_DAYS);
             item.setTrackedQuantity(0);
             itemRepository.save(item);
@@ -226,7 +226,7 @@ public class PriceCollectionJob {
             if (newPrice) {
                 price = priceService.fetchPrice(item.getMarketHashName());
                 if (price <= 0.0) {
-                    log.warn("Skipping price save for '{}' — received price={}", item.getMarketHashName(), price);
+                    log.warn("Skipping price save for '{}', received price={}", item.getMarketHashName(), price);
                     if (sleep()) {
                         totals.interrupted = true;
                         return totals;
@@ -283,7 +283,7 @@ public class PriceCollectionJob {
             log.info("Quantity decreased for '{}': {} -> {}, cost basis adjusted to {}",
                     item.getMarketHashName(), prior, fromSteam.amount(), item.getCostBasisEur());
         }
-        // prior == 0: first-see. Leave cost basis at 0 for manual backfill — today's market price
+        // prior == 0: first-see. Leave cost basis at 0 for manual backfill, since today's market price
         // is not a valid proxy for the actual acquisition cost of a pre-existing item.
         item.setTrackedQuantity(fromSteam.amount());
         itemRepository.save(item);

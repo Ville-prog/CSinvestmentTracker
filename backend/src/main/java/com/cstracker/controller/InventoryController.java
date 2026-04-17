@@ -57,7 +57,7 @@ public class InventoryController {
     /**
      * Returns all tracked items from the database with latest price and P&L data.
      * GET /api/inventory/items
-     * Does not call the Steam API — reads from the local database only.
+     * Does not call the Steam API; reads from the local database only.
      *
      * @return list of InventoryItemView records sorted by total value descending
      */

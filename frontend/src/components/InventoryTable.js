@@ -34,7 +34,7 @@ function InventoryTable({ items }) {
   const [sortAsc, setSortAsc] = useState(false);
 
   /**
-   * @brief Handles a column header click — sets sort key or toggles direction if already active.
+   * @brief Handles a column header click; sets sort key or toggles direction if already active.
    *
    * @param {string} key The data key to sort by
    */

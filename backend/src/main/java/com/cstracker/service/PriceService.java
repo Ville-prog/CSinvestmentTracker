@@ -98,7 +98,7 @@ public class PriceService {
             }
 
             if (!response.isSuccess()) {
-                log.warn("success=false for '{}' — median='{}' lowest='{}'",
+                log.warn("success=false for '{}', median='{}' lowest='{}'",
                         marketHashName, response.getMedianPrice(), response.getLowestPrice());
                 return 0.0;
             }
@@ -112,7 +112,7 @@ public class PriceService {
             return parsed;
 
         } catch (Exception e) {
-            log.warn("Exception fetching price for '{}': {} — {}", marketHashName, e.getClass().getSimpleName(), e.getMessage());
+            log.warn("Exception fetching price for '{}': {}: {}", marketHashName, e.getClass().getSimpleName(), e.getMessage());
             return 0.0;
         }
     }

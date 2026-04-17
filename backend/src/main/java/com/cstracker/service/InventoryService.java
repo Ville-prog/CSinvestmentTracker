@@ -3,7 +3,7 @@
  *
  * Service for building the tracked inventory view from database records.
  * Joins Item entities with their latest Price record to produce per-item value and P&L data.
- * Does not call any external APIs — all data is read from the local database.
+ * Does not call any external APIs; all data is read from the local database.
  *
  * @author Ville Laaksoaho
  */

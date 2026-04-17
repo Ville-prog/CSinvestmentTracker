@@ -23,17 +23,11 @@ That said, individual items can be volatile. **The market behaves more like an i
 
 A nightly job runs at 11 PM UTC and is split into two stages. First, it fetches the Steam inventory and upserts any newly discovered items into the database. Second, it collects the current Steam Market price for **every tracked item in the database**, not only the items returned by today's Steam response. Prices are saved daily, building a historical record over time, and a portfolio snapshot (total value, total cost basis, unit count) is saved at the end of each run.
 
-This two-stage design absorbs transient gaps in Steam's inventory response. If Steam temporarily returns fewer items than expected (truncation, rate limits, or silent filtering), tracked items still get priced from the DB and the portfolio value stays accurate.
+This two-stage design absorbs transient gaps in Steam's inventory response. If Steam temporarily returns fewer items than expected (truncation, rate limits, or silent filtering), tracked items still get priced from the DB and the portfolio value stays accurate. Items missing from Steam for more than 7 consecutive days are considered traded away.
 
-### Detecting traded-away items
+## P&L calculation
 
-Because pricing is driven by the DB rather than the Steam response, the app needs a separate way to know when an item has actually been traded away. Each item carries a `last_seen_in_steam` timestamp that is advanced every time the item appears in a sane Steam response. Items whose last-seen timestamp falls outside a 7-day grace window are considered traded away and their tracked quantity is set to zero. A sanity gate further guards the process: if today's Steam response is below 50% of the recent 7-day maximum unit count, the run is treated as degraded — prices are still fetched, but `last_seen` and `trackedQuantity` are not touched so one bad Steam day cannot falsely age out the entire inventory.
-
-## Pages
-
-### Dashboard Page
-
-Tracks total portfolio value trough two different charts:
+Portfolio profit/loss is tracked through two charts on the dashboard:
 
 **1. P&L %:** CS2 portfolio profit/loss as a percentage. The S&P 500 line can be toggled on or off for comparison. Calculated as profit/loss relative to cost basis:
 
@@ -41,17 +35,9 @@ Tracks total portfolio value trough two different charts:
 P&L % = (current value - cost basis) / cost basis * 100
 ```
 
-When the tracked quantity of an existing item increases (new units acquired), those new units are added to the cost basis at today's market price. When it decreases (units sold), the cost basis is scaled proportionally. Items seen for the very first time default to a cost basis of zero — today's price is not a valid proxy for the original acquisition cost of a pre-existing stack, so the initial cost basis must be set manually in the database. **This means the chart only moves when prices change; adding new items to the inventory does not affect the P&L line.** This mirrors how real investment portfolio trackers work: buying new shares increases your portfolio value, but does not count as a gain. Only price appreciation of what you already hold moves the return percentage.
+When the tracked quantity of an existing item increases (new units acquired), those new units are added to the cost basis at today's market price. When it decreases (units sold), the cost basis is scaled proportionally. Items seen for the very first time default to a cost basis of zero, since today's price is not a valid proxy for the original acquisition cost of a pre-existing stack, so the initial cost basis must be set manually in the database. **This means the chart only moves when prices change; adding new items to the inventory does not affect the P&L line.** This mirrors how real investment portfolio trackers work: buying new shares increases your portfolio value, but does not count as a gain. Only price appreciation of what you already hold moves the return percentage.
 
 **2. Total Value:** Raw portfolio value in EUR over time. Unlike the P&L chart, this reflects absolute value including the effect of adding new items to the inventory.
-
-### Inventory Page
-
-A sortable table of all tracked items showing name, item icon, quantity, price per unit, total value, and P&L % per item. Sortable by any column.
-
-### About Page
-
-A short summary of the project.
 
 ## Steam API limitations
 

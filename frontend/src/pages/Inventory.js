@@ -2,7 +2,7 @@
  * Inventory.js
  *
  * Inventory page displaying all tracked CS2 items with their latest price, total value, and P&L.
- * Fetches data from the backend database — does not call the Steam API directly.
+ * Fetches data from the backend database; does not call the Steam API directly.
  *
  * @author Ville Laaksoaho
  * Dependencies: InventoryTable.js, Dashboard.css

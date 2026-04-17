@@ -32,7 +32,7 @@ function About() {
 
       <div className="about-section">
         <h2 className="about-heading">How it works</h2>
-        <p>A nightly job runs at 11 PM UTC and fetches the Steam inventory, upserting any newly discovered items into the database. It then collects the current Steam Market price for every tracked item in the database — not only the items returned by today's Steam response — so transient gaps or truncations in the Steam API don't distort the portfolio value.</p>
+        <p>A nightly job runs at 11 PM UTC and fetches the Steam inventory, upserting any newly discovered items into the database. It then collects the current Steam Market price for every tracked item in the database, not only the items returned by today's Steam response, so transient gaps or truncations in the Steam API don't distort the portfolio value.</p>
         <p>Each item carries a last-seen timestamp that is advanced whenever it appears in a sane Steam response. Items missing for more than 7 days are considered traded away, and a sanity gate protects against one bad Steam day silently ageing out the whole inventory.</p>
         <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 4 seconds. This is the compliant approach. Many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
       </div>
@@ -41,7 +41,7 @@ function About() {
         <h2 className="about-heading">P&L calculation</h2>
         <p>Portfolio profit/loss is calculated relative to cost basis:</p>
         <pre className="about-formula">P&L % = (current value − cost basis) / cost basis × 100</pre>
-        <p>When new units of an item are added to the tracked inventory, they enter the cost basis at today's market price. When units are sold, the cost basis is scaled proportionally. Items seen for the first time default to a zero cost basis — today's price is not a valid stand-in for the actual acquisition cost of a pre-existing stack, so the initial value is backfilled manually. This means the chart only moves when prices change; adding items does not count as a gain. It mirrors how real investment portfolio trackers work.</p>
+        <p>When new units of an item are added to the tracked inventory, they enter the cost basis at today's market price. When units are sold, the cost basis is scaled proportionally. Items seen for the first time default to a zero cost basis, since today's price is not a valid stand-in for the actual acquisition cost of a pre-existing stack, so the initial value is backfilled manually. This means the chart only moves when prices change; adding items does not count as a gain. It mirrors how real investment portfolio trackers work.</p>
       </div>
 
       <div className="about-section">

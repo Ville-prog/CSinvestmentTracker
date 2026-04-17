@@ -36,7 +36,7 @@ public interface PortfolioSnapshotRepository extends JpaRepository<PortfolioSnap
 
     /**
      * Returns the maximum item_count across all snapshots on or after the given date.
-     * Used as the sanity-check baseline for today's Steam response — if today's
+     * Used as the sanity-check baseline for today's Steam response: if today's
      * response size is far below this, the run is treated as degraded.
      *
      * @param since inclusive lower bound for the snapshot date window
