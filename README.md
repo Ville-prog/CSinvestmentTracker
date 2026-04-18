@@ -17,6 +17,8 @@ A personal CS2 skin investment tracker that records the daily market value of a 
 
 Read-only view of my personal inventory.
 
+![showcase](docs/showcase.gif)
+
 ## What is the CS2 skin market?
 
 CS2 (Counter-Strike 2) is a free-to-play competitive shooter made by Valve with an **in-game economy** where players own cosmetic weapon skins. These skins are stored on your Steam account and can be freely traded, bought, and sold. Unlike most in-game items, **CS2 skins have real monetary value.**
@@ -87,22 +89,6 @@ CSinvestmentTracker/
         └── components/         # PortfolioChart, PortfolioValueChart, InventoryTable
 ```
 
-## Running locally
-
-Requires Java 21, Node 18+, and a local PostgreSQL instance.
-
-```bash
-# backend (from /backend)
-export DB_PASSWORD=yourpassword
-export ADMIN_SECRET=anything
-./mvnw spring-boot:run
-
-# frontend (from /frontend)
-npm install
-npm start
-```
-
-The backend reads `PGHOST`, `PGPORT`, `PGDATABASE`, `PGUSER`, `PGPASSWORD`, `STEAM_USER_ID`, and `ADMIN_SECRET` from the environment. Defaults in [application.properties](backend/src/main/resources/application.properties) cover most local setups. The frontend reads `REACT_APP_API_URL` and falls back to `http://localhost:8080`.
 
 ## Limitations and future improvements
 
