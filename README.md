@@ -1,5 +1,14 @@
 # CS Investment Tracker
 
+![CI](https://github.com/Ville-prog/CSinvestmentTracker/actions/workflows/ci.yml/badge.svg)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fcsinvestmenttracker.vercel.app)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+
+
+
+
+
+
 A personal CS2 skin investment tracker that records the daily market value of a Steam inventory, charts its returns over time, and compares them against the S&P 500. Essentially a stock portfolio tracker, but for CS2 skins.
 
 ## Live Demo
