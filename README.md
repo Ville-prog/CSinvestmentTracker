@@ -4,20 +4,14 @@
 ![Website](https://img.shields.io/website?url=https%3A%2F%2Fcsinvestmenttracker.vercel.app)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-
-
-
-
-
 A personal CS2 skin investment tracker that records the daily market value of a Steam inventory, charts its returns over time, and compares them against the S&P 500. Essentially a stock portfolio tracker, but for CS2 skins.
 
-## Live Demo
+## Live App
 
-[csinvestmenttracker.vercel.app](https://csinvestmenttracker.vercel.app/)
-
-Read-only view of my personal inventory.
 
 ![showcase](docs/showcase.gif)
+
+Live view of my personal portfolio. Tracking started **19.4.2026** so the live app has limited history, the GIF uses illustrative data to demonstrate the full feature set.
 
 ## What is the CS2 skin market?
 
@@ -44,7 +38,7 @@ Many third-party tracker sites work around these by running networks of Steam bo
 
 ## How it works
 
-The nightly job runs at 11 PM UTC in two stages. First, it fetches the Steam inventory and upserts any newly discovered items into the database. Second, it collects the current Steam Market price for **every tracked item in the database**, not only the items returned by today's Steam response. Prices are saved daily, building a historical record over time, and a portfolio snapshot (total value, total cost basis, unit count) is saved at the end of each run.
+A nightly job runs at 11 PM UTC in two stages. First, it fetches the Steam inventory and upserts any newly discovered items into the database. Second, it collects the current Steam Market price for **every tracked item in the database**, not only the items returned by today's Steam response. Prices are saved daily, building a historical record over time, and a portfolio snapshot (total value, total cost basis, unit count) is saved at the end of each run.
 
 Because pricing is driven by the DB rather than the Steam response, transient gaps don't distort the chart: tracked items still get priced even on days Steam returns fewer of them. Items missing from Steam for more than 7 consecutive days are considered traded away.
 
@@ -52,15 +46,15 @@ Because pricing is driven by the DB rather than the Steam response, transient ga
 
 Portfolio profit/loss is tracked through two charts on the dashboard:
 
-**1. P&L %:** CS2 portfolio profit/loss as a percentage. The S&P 500 line can be toggled on or off for comparison. Calculated as profit/loss relative to cost basis:
+**1. Total Value:** Raw portfolio value in EUR over time. Unlike the P&L chart, this reflects absolute value including the effect of adding new items to the inventory.
+
+**2. P&L %:** CS2 portfolio profit/loss as a percentage. The S&P 500 line can be toggled on or off for comparison. Calculated as profit/loss relative to cost basis:
 
 ```
 P&L % = (current value - cost basis) / cost basis * 100
 ```
 
-When the tracked quantity of an existing item increases (new units acquired), those new units are added to the cost basis at today's market price. When it decreases (units sold), the cost basis is scaled proportionally. Items seen for the very first time have their cost basis set to today's market price automatically. **This means the chart only moves when prices change; adding new items to the inventory does not affect the P&L line.** This mirrors how real investment portfolio trackers work: buying new shares increases your portfolio value, but does not count as a gain. Only price appreciation of what you already hold moves the return percentage.
-
-**2. Total Value:** Raw portfolio value in EUR over time. Unlike the P&L chart, this reflects absolute value including the effect of adding new items to the inventory.
+When the tracked quantity of an existing item increases (new units acquired), those new units are added to the cost basis at today's market price. When it decreases (units sold), the cost basis is scaled proportionally. Items seen for the very first time have their cost basis set to today's market price automatically. **This means the chart only moves when prices change; adding new items to the inventory does not affect the P&L line.** This mirrors how real investment portfolio trackers work: buying new shares increases your portfolio value, but does not count as a gain. **Only price appreciation of assets already held moves the return percentage.**
 
 ## Stack
 
@@ -92,6 +86,7 @@ CSinvestmentTracker/
 
 ## Limitations and future improvements
 
+- **Historical data:** The app only shows data from when tracking began. There is no way to backfill historical portfolio value before the first nightly run, which was on **19.4.2026**.
 - **Storage Containers:** Steam's inventory API only exposes the base inventory (up to 1000 slots). Items stored inside Storage Containers are not visible to the API and cannot be tracked. Items must be moved to the base inventory to be included.
 - **Trade cooldowns:** Newly traded items have a 7-day market cooldown during which they appear as non-marketable and are skipped by the price collection job.
 - **Single inventory:** The deployed live app currently tracks only one hardcoded Steam inventory. A future improvement could allow multiple Steam IDs to be registered, each with their own nightly price collection and portfolio history, though this would require careful rate limit management across all tracked inventories.
