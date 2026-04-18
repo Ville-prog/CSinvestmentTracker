@@ -283,8 +283,9 @@ public class PriceCollectionJob {
             log.info("Quantity decreased for '{}': {} -> {}, cost basis adjusted to {}",
                     item.getMarketHashName(), prior, fromSteam.amount(), item.getCostBasisEur());
         }
-        // prior == 0: first-see. Leave cost basis at 0 for manual backfill, since today's market price
-        // is not a valid proxy for the actual acquisition cost of a pre-existing item.
+        if (prior == 0) {
+            item.setCostBasisEur(fromSteam.amount() * price);
+        }
         item.setTrackedQuantity(fromSteam.amount());
         itemRepository.save(item);
     }

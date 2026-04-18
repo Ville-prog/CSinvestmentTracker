@@ -83,7 +83,7 @@ class PriceCollectionJobTest {
     }
 
     @Test
-    void firstSeeDoesNotAddToCostBasis() {
+    void firstSeeSetsCostBasisAtCurrentPrice() {
         Item justCreated = existingItem("Foo", 0.0, 0, null);
         SteamItem fromSteam = steamItem("Foo", 5);
         when(steamApiService.getInventory("12345")).thenReturn(List.of(fromSteam));
@@ -93,7 +93,7 @@ class PriceCollectionJobTest {
 
         job.collectPrices();
 
-        assertEquals(0.0, justCreated.getCostBasisEur(), 0.001);
+        assertEquals(50.0, justCreated.getCostBasisEur(), 0.001); // 5 units * 10.0
         assertEquals(5, justCreated.getTrackedQuantity());
     }
 
@@ -272,5 +272,6 @@ class PriceCollectionJobTest {
         job.collectPrices();
 
         assertFalse(justCreated.getLastSeenInSteam() == null, "last_seen should have been set on a sane run with no baseline");
+        assertEquals(50.0, justCreated.getCostBasisEur(), 0.001); // 5 units * 10.0
     }
 }

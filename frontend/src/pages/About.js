@@ -41,7 +41,7 @@ function About() {
         <h2 className="about-heading">P&L calculation</h2>
         <p>Portfolio profit/loss is calculated relative to cost basis:</p>
         <pre className="about-formula">P&L % = (current value − cost basis) / cost basis × 100</pre>
-        <p>When new units of an item are added to the tracked inventory, they enter the cost basis at today's market price. When units are sold, the cost basis is scaled proportionally. Items seen for the first time default to a zero cost basis, since today's price is not a valid stand-in for the actual acquisition cost of a pre-existing stack, so the initial value is backfilled manually. This means the chart only moves when prices change; adding items does not count as a gain. It mirrors how real investment portfolio trackers work.</p>
+        <p>When new units of an item are added to the tracked inventory, they enter the cost basis at today's market price. When units are sold, the cost basis is scaled proportionally. Items seen for the first time have their cost basis set to today's market price automatically. This means the chart only moves when prices change; adding items does not count as a gain. It mirrors how real investment portfolio trackers work.</p>
       </div>
 
       <div className="about-section">
@@ -60,7 +60,6 @@ function About() {
           <li><strong>Storage Containers:</strong> Items stored inside Steam Storage Containers are not visible to the API and cannot be tracked.</li>
           <li><strong>Trade cooldowns:</strong> Newly traded items have a 7-day market cooldown and are skipped until they become marketable.</li>
           <li><strong>Single inventory:</strong> The app currently tracks one hardcoded Steam inventory.</li>
-          <li><strong>Initial cost basis:</strong> Items discovered for the first time start at a zero cost basis and must be backfilled manually.</li>
           <li><strong>Trade-out detection delay:</strong> Since items missing from a single Steam response are still priced from the DB, truly traded-away items are only recognised after 7 consecutive days outside the inventory response.</li>
         </ul>
       </div>
