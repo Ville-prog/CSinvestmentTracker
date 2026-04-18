@@ -9,7 +9,7 @@ A personal CS2 skin investment tracker that records the daily market value of a 
 ## Live App
 
 
-![showcase](docs/showcase.gif)
+[![showcase](docs/showcase.gif)](https://csinvestmenttracker.vercel.app/)
 
 Live view of my personal portfolio. Tracking started **19.4.2026** so the live app has limited history, the GIF uses illustrative data to demonstrate the full feature set.
 
