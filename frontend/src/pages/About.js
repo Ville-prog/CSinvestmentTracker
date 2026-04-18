@@ -57,6 +57,7 @@ function About() {
       <div className="about-section">
         <h2 className="about-heading">Limitations</h2>
         <ul className="about-list">
+          <li><strong>Historical data:</strong> The app only shows data from when tracking began. There is no way to backfill historical portfolio value before the first nightly run.</li>
           <li><strong>Storage Containers:</strong> Items stored inside Steam Storage Containers are not visible to the API and cannot be tracked.</li>
           <li><strong>Trade cooldowns:</strong> Newly traded items have a 7-day market cooldown and are skipped until they become marketable.</li>
           <li><strong>Single inventory:</strong> The app currently tracks one hardcoded Steam inventory.</li>
