@@ -1,9 +1,8 @@
 /**
  * PortfolioValueChart.js
  *
- * Line chart showing raw CS2 portfolio value in EUR over time.
- * Unlike the comparison chart, this shows absolute value including the effect of adding new items.
- * Supports time range selection (Max, 1Y, 6M, 3M, 1M, 1W).
+ * Area chart showing raw CS2 portfolio value in EUR over a selected time range.
+ * Unlike the P&L chart, this shows absolute value including the effect of adding new items.
  *
  * @author Ville Laaksoaho
  * Dependencies: recharts, PortfolioChart.css
@@ -48,7 +47,7 @@ function fromDate(range) {
  * @brief Formats an ISO date string into DD.MM.YYYY format.
  *
  * @param {string} dateStr ISO date string (YYYY-MM-DD)
- * @returns {string} Formatted date label (e.g. "09.04.2026")
+ * @returns {string} Formatted date label (e.g. "12.04.2026")
  */
 function formatDate(dateStr) {
   const [year, month, day] = dateStr.split('-');
@@ -56,10 +55,10 @@ function formatDate(dateStr) {
 }
 
 /**
- * @brief Chart component that fetches portfolio history and renders total EUR value over time.
- *        Includes time range selector buttons. Does not normalize data; shows absolute values.
+ * @brief Area chart fetching portfolio history and rendering total EUR value over the selected range.
+ *        The chart summary shows the absolute EUR change from the first to the last point in range.
  *
- * @returns {JSX.Element} The portfolio total value chart with range buttons
+ * @returns {JSX.Element} The portfolio total value chart with range selector buttons
  */
 function PortfolioValueChart() {
   const [data, setData] = useState([]);

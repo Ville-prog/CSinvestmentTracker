@@ -1,3 +1,12 @@
+/**
+ * PortfolioChart.js
+ *
+ * Area chart comparing CS2 portfolio P&L against the S&P 500 over a selected time range.
+ * Both series display percentage change from the first point in the selected range.
+ *
+ * @author Ville Laaksoaho
+ * Dependencies: recharts, PortfolioChart.css
+ */
 import { useEffect, useState } from 'react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip,
@@ -16,6 +25,13 @@ const RANGES = [
   { label: '1W', weeks: 1 },
 ];
 
+/**
+ * @brief Returns an ISO date string for the start of the given range.
+ *        Supports month-based and week-based ranges. Returns the CS:GO skin market launch date for Max.
+ *
+ * @param {{ months: number|null, weeks?: number }} range Range object from the RANGES array
+ * @returns {string} ISO date string (YYYY-MM-DD)
+ */
 function fromDate(range) {
   if (range.months === null) return '2013-08-13';
   const d = new Date();
@@ -27,6 +43,13 @@ function fromDate(range) {
   return d.toISOString().split('T')[0];
 }
 
+/**
+ * @brief Normalizes a list of data points to percentage change from the first value.
+ *
+ * @param {{ date: string, [valueKey]: number }[]} dataPoints Array of data point objects
+ * @param {string} valueKey The key to normalize on
+ * @returns {{ date: string, pct: number }[]} Normalized data points with percentage change
+ */
 function normalize(dataPoints, valueKey) {
   const valid = dataPoints.filter(p => p[valueKey] != null);
   if (valid.length === 0) return [];
@@ -38,11 +61,24 @@ function normalize(dataPoints, valueKey) {
   }));
 }
 
+/**
+ * @brief Formats an ISO date string into DD.MM.YYYY format.
+ *
+ * @param {string} dateStr ISO date string (YYYY-MM-DD)
+ * @returns {string} Formatted date label (e.g. "12.04.2026")
+ */
 function formatDate(dateStr) {
   const [year, month, day] = dateStr.split('-');
   return `${day}.${month}.${year}`;
 }
 
+/**
+ * @brief Area chart fetching portfolio history and S&P 500 data and rendering P&L % over the selected range.
+ *        The chart summary shows range-based change (last minus first point). The S&P 500 toggle renders
+ *        as a transparent-fill area so it displays correctly inside Recharts AreaChart.
+ *
+ * @returns {JSX.Element} The portfolio P&L chart with range selector and optional S&P 500 overlay
+ */
 function PortfolioChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);

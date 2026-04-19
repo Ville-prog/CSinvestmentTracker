@@ -1,3 +1,12 @@
+/**
+ * Dashboard.js
+ *
+ * Main dashboard page displaying a hero portfolio value stat, 24h change, charts, and the full inventory table.
+ * Fetches the latest portfolio snapshot, inventory items, and portfolio history on mount.
+ *
+ * @author Ville Laaksoaho
+ * Dependencies: PortfolioChart.js, PortfolioValueChart.js, InventoryTable.js, Dashboard.css
+ */
 import { useEffect, useState } from 'react';
 import PortfolioChart from '../components/PortfolioChart';
 import PortfolioValueChart from '../components/PortfolioValueChart';
@@ -6,6 +15,11 @@ import './Dashboard.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
+/**
+ * @brief Renders the dashboard with a hero value stat, 24h change badge, chart tabs, and inventory table.
+ *
+ * @returns {JSX.Element} The full dashboard page
+ */
 function Dashboard() {
   const [snapshot, setSnapshot] = useState(null);
   const [items, setItems] = useState([]);
