@@ -1,6 +1,6 @@
 # CS Investment Tracker
 
-![CI](https://github.com/Ville-prog/CSinvestmentTracker/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/Ville-prog/CSinvestmentTracker/actions/workflows/ci.yml/badge.svg)](https://github.com/Ville-prog/CSinvestmentTracker/actions/workflows/ci.yml)
 ![Website](https://img.shields.io/website?url=https%3A%2F%2Fcsinvestmenttracker.vercel.app)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
