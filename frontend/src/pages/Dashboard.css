@@ -4,45 +4,65 @@
   gap: 24px;
 }
 
-.page-title {
-  font-size: 28px;
-  font-weight: 600;
-  color: #ffffff;
+.hero-stats {
+  padding: 8px 0 4px;
 }
 
-.snapshot-date {
-  font-size: 13px;
-  color: #888;
-}
-
-.stat-cards {
-  display: flex;
-  gap: 16px;
+.hero-stats-value {
+  font-size: 72px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
-.stat-card {
-  background-color: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  border-radius: 8px;
-  padding: 24px 32px;
-  display: flex;
-  flex-direction: column;
+.hero-stats-change {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  min-width: 180px;
+  color: #4caf50;
+  font-size: 15px;
+  font-weight: 500;
 }
 
-.stat-label {
-  font-size: 13px;
-  color: #888;
+.hero-stats-change.negative {
+  color: #e05c5c;
+}
+
+.hero-stats-change-tag {
+  font-size: 10px;
+  font-weight: 600;
+  color: #4caf50;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  padding: 2px 6px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.stat-value {
-  font-size: 32px;
-  font-weight: 700;
-  color: #ffffff;
+.hero-stats-change-tag.negative {
+  color: #e05c5c;
+  background: rgba(224, 92, 92, 0.1);
+  border-color: rgba(224, 92, 92, 0.3);
+}
+
+.hero-stats-meta {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  color: #888;
+  font-size: 13px;
+}
+
+.hero-stats-meta strong {
+  color: #e0e0e0;
+  font-weight: 600;
+  margin-right: 4px;
 }
 
 .chart-tabs {
@@ -59,6 +79,7 @@
   cursor: pointer;
   font-size: 14px;
   transition: all 0.15s;
+  font-family: inherit;
 }
 
 .chart-tab:hover {
@@ -73,7 +94,7 @@
 .chart-wrapper {
   background-color: #1a1a1a;
   border: 1px solid #2a2a2a;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 24px 16px 16px;
 }
 
@@ -90,5 +111,13 @@
 }
 
 .status-text.error {
+  color: #e05c5c;
+}
+
+.positive {
+  color: #4caf50;
+}
+
+.negative {
   color: #e05c5c;
 }

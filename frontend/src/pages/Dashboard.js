@@ -1,12 +1,3 @@
-/**
- * Dashboard.js
- *
- * Main dashboard page displaying portfolio snapshot stats, charts, and the full inventory table.
- * Fetches both the latest portfolio snapshot and inventory items on mount.
- *
- * @author Ville Laaksoaho
- * Dependencies: PortfolioChart.js, PortfolioValueChart.js, InventoryTable.js, Dashboard.css
- */
 import { useEffect, useState } from 'react';
 import PortfolioChart from '../components/PortfolioChart';
 import PortfolioValueChart from '../components/PortfolioValueChart';
@@ -15,14 +6,10 @@ import './Dashboard.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
-/**
- * @brief Fetches and displays portfolio snapshot stats, charts, and the sortable inventory table.
- *
- * @returns {JSX.Element} The dashboard page with stat cards, charts, and inventory table
- */
 function Dashboard() {
   const [snapshot, setSnapshot] = useState(null);
   const [items, setItems] = useState([]);
+  const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [chartView, setChartView] = useState('performance');
@@ -30,11 +17,13 @@ function Dashboard() {
   useEffect(() => {
     Promise.all([
       fetch(`${API_BASE}/api/portfolio/latest`).then(r => r.ok ? r.json() : null),
-      fetch(`${API_BASE}/api/inventory/items`).then(r => r.ok ? r.json() : [])
+      fetch(`${API_BASE}/api/inventory/items`).then(r => r.ok ? r.json() : []),
+      fetch(`${API_BASE}/api/portfolio/history`).then(r => r.ok ? r.json() : [])
     ])
-      .then(([snapshotData, itemsData]) => {
+      .then(([snapshotData, itemsData, historyData]) => {
         setSnapshot(snapshotData);
         setItems(itemsData);
+        setHistory(historyData || []);
         setLoading(false);
       })
       .catch(err => {
@@ -46,28 +35,32 @@ function Dashboard() {
   if (loading) return <p className="status-text">Loading...</p>;
   if (error) return <p className="status-text error">{error}</p>;
 
-  const totalValue = items.reduce((sum, item) => sum + item.totalValueEur, 0);
+  const totalValue = snapshot?.totalValueEur ?? items.reduce((sum, item) => sum + item.totalValueEur, 0);
   const totalUnits = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const dailyChange = history.length >= 2
+    ? history[history.length - 1].totalValueEur - history[history.length - 2].totalValueEur
+    : null;
+  const dailyChangePct = dailyChange != null && history[history.length - 2].totalValueEur > 0
+    ? (dailyChange / history[history.length - 2].totalValueEur * 100)
+    : null;
 
   return (
     <div className="dashboard">
-      <h1 className="page-title">CS2 Portfolio</h1>
-      {snapshot && (
-        <p className="snapshot-date">Last updated: {snapshot.date.split('-').reverse().join('.')}</p>
-      )}
-
-      <div className="stat-cards">
-        <div className="stat-card">
-          <span className="stat-label">Total Value</span>
-          <span className="stat-value">€{totalValue.toFixed(2)}</span>
+      <div className="hero-stats">
+        <div className="hero-stats-value">
+          €{totalValue.toFixed(2)}
+          {dailyChange != null && (
+            <span className={`hero-stats-change ${dailyChange < 0 ? 'negative' : ''}`}>
+              {dailyChange >= 0 ? '▲' : '▼'} {dailyChange >= 0 ? '+' : ''}€{Math.abs(dailyChange).toFixed(2)}
+              {dailyChangePct != null && `(${dailyChangePct >= 0 ? '+' : ''}${dailyChangePct.toFixed(2)}%)`}
+              <span className={`hero-stats-change-tag ${dailyChange < 0 ? 'negative' : ''}`}>24H</span>
+            </span>
+          )}
         </div>
-        <div className="stat-card">
-          <span className="stat-label">Unique Items</span>
-          <span className="stat-value">{items.length}</span>
-        </div>
-        <div className="stat-card">
-          <span className="stat-label">Total Units</span>
-          <span className="stat-value">{totalUnits}</span>
+        <div className="hero-stats-meta">
+          <span><strong>{items.length}</strong> unique items</span>
+          <span><strong>{totalUnits}</strong> total units</span>
         </div>
       </div>
 

@@ -1,16 +1,6 @@
-/**
- * PortfolioChart.js
- *
- * Line chart component comparing CS2 portfolio value against the S&P 500 index over time.
- * Both series are normalized to percentage change from the first data point for comparison.
- * Supports time range selection (Max, 1Y, 6M, 3M, 1M).
- *
- * @author Ville Laaksoaho
- * Dependencies: recharts, PortfolioChart.css
- */
 import { useEffect, useState } from 'react';
 import {
-  AreaChart, Area, Line, XAxis, YAxis, Tooltip,
+  AreaChart, Area, XAxis, YAxis, Tooltip,
   ResponsiveContainer, ReferenceLine, Legend, CartesianGrid
 } from 'recharts';
 import './PortfolioChart.css';
@@ -26,13 +16,6 @@ const RANGES = [
   { label: '1W', weeks: 1 },
 ];
 
-/**
- * @brief Returns an ISO date string for the start of the given range.
- *        Supports month-based and week-based ranges. Returns the CS:GO skin market launch date for Max.
- *
- * @param {{ months: number|null, weeks?: number }} range Range object from the RANGES array
- * @returns {string} ISO date string (YYYY-MM-DD)
- */
 function fromDate(range) {
   if (range.months === null) return '2013-08-13';
   const d = new Date();
@@ -44,13 +27,6 @@ function fromDate(range) {
   return d.toISOString().split('T')[0];
 }
 
-/**
- * @brief Normalizes a list of data points to percentage change from the first value.
- *
- * @param {{ date: string, [valueKey]: number }[]} dataPoints Array of data point objects
- * @param {string} valueKey The key to normalize on
- * @returns {{ date: string, pct: number }[]} Normalized data points with percentage change
- */
 function normalize(dataPoints, valueKey) {
   const valid = dataPoints.filter(p => p[valueKey] != null);
   if (valid.length === 0) return [];
@@ -62,23 +38,11 @@ function normalize(dataPoints, valueKey) {
   }));
 }
 
-/**
- * @brief Formats an ISO date string into a short human-readable label.
- *
- * @param {string} dateStr ISO date string (YYYY-MM-DD)
- * @returns {string} Formatted date label (e.g. "9 Apr '26")
- */
 function formatDate(dateStr) {
   const [year, month, day] = dateStr.split('-');
   return `${day}.${month}.${year}`;
 }
 
-/**
- * @brief Chart component that fetches portfolio history and S&P 500 data, then renders a
- *        normalized percentage change line chart with time range selector buttons.
- *
- * @returns {JSX.Element} The portfolio comparison chart with range buttons
- */
 function PortfolioChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -140,6 +104,20 @@ function PortfolioChart() {
       .catch(() => setLoading(false));
   }, [range]);
 
+  const firstPortfolio = data.find(p => p.portfolio != null)?.portfolio;
+  const lastPortfolio = [...data].reverse().find(p => p.portfolio != null)?.portfolio;
+  const portfolioRangeChange = firstPortfolio != null && lastPortfolio != null
+    ? parseFloat((lastPortfolio - firstPortfolio).toFixed(2))
+    : null;
+
+  const firstSp500 = data.find(p => p.sp500 != null)?.sp500;
+  const lastSp500 = [...data].reverse().find(p => p.sp500 != null)?.sp500;
+  const sp500RangeChange = firstSp500 != null && lastSp500 != null
+    ? parseFloat((lastSp500 - firstSp500).toFixed(2))
+    : null;
+
+  const fmt = v => v != null ? `${v > 0 ? '+' : ''}${v.toFixed(2)}%` : null;
+
   return (
     <div className="chart-wrapper">
       <div className="chart-controls">
@@ -162,27 +140,20 @@ function PortfolioChart() {
         </button>
       </div>
 
-      {!loading && data.length > 0 && (() => {
-        const last = data[data.length - 1];
-        const portfolioVal = last?.portfolio;
-        const lastSp500 = [...data].reverse().find(p => p.sp500 != null);
-        const sp500Val = lastSp500?.sp500;
-        const fmt = v => v != null ? `${v > 0 ? '+' : ''}${v.toFixed(2)}%` : null;
-        return (
-          <div className="chart-summary">
-            {portfolioVal != null && (
-              <span className={`chart-summary-stat ${portfolioVal > 0 ? 'positive' : portfolioVal < 0 ? 'negative' : ''}`}>
-                CS2 {fmt(portfolioVal)}
-              </span>
-            )}
-            {showSp500 && sp500Val != null && (
-              <span className={`chart-summary-stat ${sp500Val > 0 ? 'positive' : sp500Val < 0 ? 'negative' : ''}`}>
-                S&P 500 {fmt(sp500Val)}
-              </span>
-            )}
-          </div>
-        );
-      })()}
+      {!loading && data.length > 0 && (
+        <div className="chart-summary">
+          {portfolioRangeChange != null && (
+            <span className={`chart-summary-stat ${portfolioRangeChange > 0 ? 'positive' : portfolioRangeChange < 0 ? 'negative' : ''}`}>
+              CS2 {fmt(portfolioRangeChange)}
+            </span>
+          )}
+          {showSp500 && sp500RangeChange != null && (
+            <span className={`chart-summary-stat sp500 ${sp500RangeChange > 0 ? 'positive' : sp500RangeChange < 0 ? 'negative' : ''}`}>
+              S&P 500 {fmt(sp500RangeChange)}
+            </span>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <p className="status-text">Loading chart...</p>
@@ -218,17 +189,40 @@ function PortfolioChart() {
                 name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'
               ]}
               labelFormatter={formatDate}
-              contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6 }}
+              contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 0 }}
               labelStyle={{ color: '#888' }}
             />
             <Legend
-              formatter={name => name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'}
-              wrapperStyle={{ fontSize: 13, color: '#888' }}
+              formatter={name => (
+                <span style={{ color: name === 'portfolio' ? '#4f9eff' : '#f0c040', fontSize: 13 }}>
+                  {name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'}
+                </span>
+              )}
             />
             <CartesianGrid stroke="#222" strokeDasharray="3 3" vertical={false} />
             <ReferenceLine y={0} stroke="#333" strokeDasharray="3 3" />
-            {showSp500 && <Line type="monotone" dataKey="sp500" stroke="#f0c040" strokeWidth={2} dot={false} activeDot={{ r: 4 }} connectNulls />}
-            <Area type="monotone" dataKey="portfolio" stroke="#4f9eff" strokeWidth={2} fill="url(#portfolioGradient)" dot={false} activeDot={{ r: 4 }} connectNulls />
+            {showSp500 && (
+              <Area
+                type="monotone"
+                dataKey="sp500"
+                stroke="#f0c040"
+                strokeWidth={2}
+                fill="none"
+                dot={false}
+                activeDot={{ r: 4 }}
+                connectNulls
+              />
+            )}
+            <Area
+              type="monotone"
+              dataKey="portfolio"
+              stroke="#4f9eff"
+              strokeWidth={2}
+              fill="url(#portfolioGradient)"
+              dot={false}
+              activeDot={{ r: 4 }}
+              connectNulls
+            />
           </AreaChart>
         </ResponsiveContainer>
       )}

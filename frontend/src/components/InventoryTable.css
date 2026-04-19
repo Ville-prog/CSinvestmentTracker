@@ -2,7 +2,7 @@
   overflow-x: auto;
   background-color: #1a1a1a;
   border: 1px solid #2a2a2a;
-  border-radius: 8px;
+  border-radius: 0;
 }
 
 .inventory-table {

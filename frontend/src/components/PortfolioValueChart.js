@@ -143,7 +143,7 @@ function PortfolioValueChart() {
             <Tooltip
               formatter={value => [`€${value.toFixed(2)}`, 'Portfolio Value']}
               labelFormatter={formatDate}
-              contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 6 }}
+              contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 0 }}
               labelStyle={{ color: '#888' }}
             />
             <CartesianGrid stroke="#222" strokeDasharray="3 3" vertical={false} />
