@@ -82,10 +82,10 @@
   text-decoration: underline;
 }
 
-.positive {
+.inventory-table td.positive {
   color: #4caf50;
 }
 
-.negative {
+.inventory-table td.negative {
   color: #e05c5c;
 }
