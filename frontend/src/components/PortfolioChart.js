@@ -118,20 +118,28 @@ function PortfolioChart() {
               })
             );
 
-            const allDates = history
-              .filter(h => h.date >= sp500From)
-              .map(h => h.date)
-              .sort();
+            const portfolioDates = new Set(
+              history.filter(h => h.date >= sp500From).map(h => h.date)
+            );
+            const allDates = [
+              ...new Set([
+                ...portfolioDates,
+                ...normSp500.filter(p => p.date >= sp500From).map(p => p.date)
+              ])
+            ].sort();
 
             let lastSp500Pct = null;
-            const merged = allDates.map(date => {
+            const merged = [];
+            for (const date of allDates) {
               if (sp500Map[date] != null) lastSp500Pct = sp500Map[date];
-              return {
-                date,
-                sp500: lastSp500Pct,
-                portfolio: portfolioMap[date] ?? null
-              };
-            });
+              if (portfolioDates.has(date)) {
+                merged.push({
+                  date,
+                  sp500: lastSp500Pct,
+                  portfolio: portfolioMap[date] ?? null
+                });
+              }
+            }
 
             setData(merged);
             setLoading(false);
