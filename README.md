@@ -33,7 +33,7 @@ Many third-party tracker sites work around these by running networks of Steam bo
 
 ## How it works
 
-A nightly job runs at 11 PM UTC in two stages:
+A daily job runs at 5 AM UTC (8 AM Finnish time) in two stages:
 
 1. **Inventory sync:** Fetches the Steam inventory and upserts newly discovered items.
 2. **Price collection:** Fetches current market prices for all tracked items in the database.

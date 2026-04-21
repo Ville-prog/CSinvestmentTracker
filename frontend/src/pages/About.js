@@ -32,7 +32,7 @@ function About() {
 
       <div className="about-section">
         <h2 className="about-heading">How it works</h2>
-        <p>A nightly job runs at 11 PM UTC and fetches the Steam inventory, upserting any newly discovered items into the database. It then collects the current Steam Market price for every tracked item in the database, not only the items returned by today's Steam response, so transient gaps or truncations in the Steam API don't distort the portfolio value.</p>
+        <p>A daily job runs at 5 AM UTC (8 AM Finnish time) and fetches the Steam inventory, upserting any newly discovered items into the database. It then collects the current Steam Market price for every tracked item in the database, not only the items returned by today's Steam response, so transient gaps or truncations in the Steam API don't distort the portfolio value.</p>
         <p>Each item carries a last-seen timestamp that is advanced whenever it appears in a sane Steam response. Items missing for more than 7 days are considered traded away, and a sanity gate protects against one bad Steam day silently ageing out the whole inventory.</p>
         <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 4 seconds. This is the compliant approach. Many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
       </div>
