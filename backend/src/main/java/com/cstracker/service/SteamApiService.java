@@ -82,7 +82,7 @@ public class SteamApiService {
      * @param response the raw Steam inventory API response
      * @return list of SteamItem records with ownership and display data merged
      */
-    private List<SteamItem> parseInventory(SteamInventoryResponse response) {
+    public List<SteamItem> parseInventory(SteamInventoryResponse response) {
         Map<String, SteamDescription> descriptionMap = response.getDescriptions().stream()
                 .collect(Collectors.toMap(
                         d -> d.getClassid() + "_" + d.getInstanceid(),

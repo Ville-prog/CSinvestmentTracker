@@ -66,10 +66,10 @@ public class PriceCollectionJob {
     /**
      * Constructs the job with all required service and repository dependencies.
      *
-     * @param steamApiService   service used to fetch the Steam inventory
-     * @param priceService      service used to fetch individual item prices from Steam Market
-     * @param itemRepository    repository for upserting item records
-     * @param priceRepository   repository for saving daily price records
+     * @param steamApiService    service used to fetch the Steam inventory
+     * @param priceService       service used to fetch individual item prices from Steam Market
+     * @param itemRepository     repository for upserting item records
+     * @param priceRepository    repository for saving daily price records
      * @param snapshotRepository repository for saving daily portfolio value snapshots
      */
     public PriceCollectionJob(SteamApiService steamApiService, PriceService priceService,
@@ -83,33 +83,53 @@ public class PriceCollectionJob {
     }
 
     /**
-     * Runs the full price collection cycle:
-     * <ol>
-     *   <li>Fetches the Steam inventory and validates it against a sanity baseline.</li>
-     *   <li>Upserts any newly discovered items into the database.</li>
-     *   <li>On a sane response, updates last_seen and ages out items missing for more than {@link #GRACE_DAYS} days.</li>
-     *   <li>Fetches today's price for every currently tracked item (not only items in today's response).</li>
-     *   <li>Reconciles quantity and cost basis for items that appear in today's response with a different quantity.</li>
-     *   <li>Saves a portfolio snapshot summarising total value, cost basis, and units.</li>
-     * </ol>
-     * Skips execution entirely if a snapshot already exists for today or if the Steam response is empty.
+     * Scheduled entry point. Fetches the Steam inventory and delegates to runCollection().
      * Scheduled at 23:00 UTC daily and can also be invoked manually via the admin endpoint.
      */
     @Scheduled(cron = "0 0 23 * * *")
     public void collectPrices() {
-        LocalDate today = LocalDate.now();
-        log.info("Starting nightly price collection for {}", today);
-
-        if (snapshotRepository.findByDate(today).isPresent()) {
-            log.info("Price collection already ran today, skipping.");
-            return;
-        }
-
         List<SteamItem> steamItems = steamApiService.getInventory(steamUserId);
         log.info("Fetched {} items from Steam inventory response", steamItems.size());
 
         if (steamItems.isEmpty()) {
-            log.warn("Steam inventory returned empty, skipping snapshot save for {} to avoid poisoning the chart.", today);
+            log.warn("Steam inventory returned empty, skipping snapshot save for {} to avoid poisoning the chart.", LocalDate.now());
+            return;
+        }
+
+        runCollection(steamItems);
+    }
+
+    /**
+     * Runs price collection using a caller-supplied inventory, bypassing the Steam API fetch.
+     * Used by the admin endpoint when the nightly Steam call has failed and the user supplies
+     * the inventory JSON fetched manually from a browser session.
+     *
+     * @param steamItems pre-parsed inventory items to use as the Steam response for today's run
+     */
+    public void collectFromManualInventory(List<SteamItem> steamItems) {
+        log.info("Starting manual price collection from provided inventory ({} items)", steamItems.size());
+
+        if (steamItems.isEmpty()) {
+            log.warn("Provided inventory is empty, skipping.");
+            return;
+        }
+
+        runCollection(steamItems);
+    }
+
+    /**
+     * Core collection logic shared by both the scheduled run and the manual inventory endpoint.
+     * Validates the response against a sanity baseline, upserts items, updates last-seen timestamps,
+     * ages out stale items, fetches prices for all tracked items, and saves a portfolio snapshot.
+     *
+     * @param steamItems the inventory items to process
+     */
+    private void runCollection(List<SteamItem> steamItems) {
+        LocalDate today = LocalDate.now();
+        log.info("Starting price collection for {}", today);
+
+        if (snapshotRepository.findByDate(today).isPresent()) {
+            log.info("Price collection already ran today, skipping.");
             return;
         }
 
