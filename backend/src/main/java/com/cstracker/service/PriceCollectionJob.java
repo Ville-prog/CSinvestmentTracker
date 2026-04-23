@@ -168,6 +168,12 @@ public class PriceCollectionJob {
             log.warn("Price collection was interrupted after {} prices, saving partial snapshot.", totals.pricesCollected);
         }
 
+        if (totals.pricesCollected == 0 && totals.totalValue == 0.0 && !candidates.isEmpty()) {
+            log.warn("All {} price fetches failed (likely rate-limited), skipping snapshot save for {} to avoid poisoning the chart.",
+                    candidates.size(), today);
+            return;
+        }
+
         PortfolioSnapshot snapshot = new PortfolioSnapshot();
         snapshot.setDate(today);
         snapshot.setTotalValueEur(totals.totalValue);
