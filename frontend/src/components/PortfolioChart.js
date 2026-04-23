@@ -221,7 +221,8 @@ function PortfolioChart() {
               minTickGap={60}
             />
             <YAxis
-              tickFormatter={v => `${v > 0 ? '+' : ''}${v}%`}
+              domain={['dataMin - 2', 'dataMax + 2']}
+              tickFormatter={v => `${v > 0 ? '+' : ''}${Math.round(v)}%`}
               tick={{ fill: '#888', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
@@ -263,6 +264,7 @@ function PortfolioChart() {
               stroke="#4f9eff"
               strokeWidth={2}
               fill="url(#portfolioGradient)"
+              baseValue="dataMin"
               dot={false}
               activeDot={{ r: 4 }}
               connectNulls
