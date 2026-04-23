@@ -230,10 +230,7 @@ class PriceCollectionJobTest {
         job.collectPrices();
 
         verify(priceRepository, never()).save(any(Price.class));
-        ArgumentCaptor<PortfolioSnapshot> snapCaptor = ArgumentCaptor.forClass(PortfolioSnapshot.class);
-        verify(snapshotRepository).save(snapCaptor.capture());
-        assertEquals(0, snapCaptor.getValue().getItemCount());
-        assertEquals(0.0, snapCaptor.getValue().getTotalValueEur(), 0.001);
+        verify(snapshotRepository, never()).save(any(PortfolioSnapshot.class));
     }
 
     @Test
