@@ -84,9 +84,9 @@ public class PriceCollectionJob {
 
     /**
      * Scheduled entry point. Fetches the Steam inventory and delegates to runCollection().
-     * Scheduled at 23:00 UTC daily and can also be invoked manually via the admin endpoint.
+     * Scheduled at 05:00 UTC every 2 days and can also be invoked manually via the admin endpoint.
      */
-    @Scheduled(cron = "0 0 5 * * *")
+    @Scheduled(cron = "0 0 5 */2 * *")
     public void collectPrices() {
         List<SteamItem> steamItems = steamApiService.getInventory(steamUserId);
         log.info("Fetched {} items from Steam inventory response", steamItems.size());
