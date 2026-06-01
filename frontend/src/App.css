@@ -18,6 +18,56 @@ body {
   padding: 32px 16px;
 }
 
+.app-header {
+  padding: 24px 0 0;
+}
+
+.app-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.app-favicon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.app-name {
+  font-size: 42px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.app-subtitle-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.app-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+}
+
+.app-change {
+  font-size: 20px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.app-change.positive {
+  color: #2e7d32;
+}
+
+.app-change.negative {
+  color: #c0392b;
+}
+
 .top-nav {
   display: flex;
   gap: 8px;

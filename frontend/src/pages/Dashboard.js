@@ -49,26 +49,36 @@ function Dashboard() {
   if (loading) return <p className="status-text">Loading...</p>;
   if (error) return <p className="status-text error">{error}</p>;
 
-  const totalValue = snapshot?.totalValueEur ?? items.reduce((sum, item) => sum + item.totalValueEur, 0);
   const totalUnits = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  const dailyChange = history.length >= 2
-    ? history[history.length - 1].totalValueEur - history[history.length - 2].totalValueEur
-    : null;
-  const dailyChangePct = dailyChange != null && history[history.length - 2].totalValueEur > 0
-    ? (dailyChange / history[history.length - 2].totalValueEur * 100)
-    : null;
+  const latestValue = history.length >= 1 ? history[history.length - 1].totalValueEur : null;
+  const prevValue = history.length >= 2 ? history[history.length - 2].totalValueEur : null;
+  const change = latestValue != null && prevValue != null ? latestValue - prevValue : null;
+  const changePct = change != null && prevValue > 0 ? (change / prevValue) * 100 : null;
+  const positive = change != null && change >= 0;
 
   return (
     <div className="dashboard">
-      <div className="hero-stats">
-        <div className="hero-stats-value">
-          €{totalValue.toFixed(2)}
+      <div className="app-header">
+        <div className="app-title-row">
+          <img src="/favicon.ico" className="app-favicon" alt="" />
+          <span className="app-name">CS2 Portfolio</span>
         </div>
-        <div className="hero-stats-meta">
-          <span><strong>{items.length}</strong> unique items</span>
-          <span><strong>{totalUnits}</strong> total units</span>
-        </div>
+        {latestValue != null && (
+          <div className="app-subtitle-row">
+            <span className="app-value">€{latestValue.toFixed(2)}</span>
+            {change != null && (
+              <span className={`app-change ${positive ? 'positive' : 'negative'}`}>
+                {positive ? '+' : ''}€{change.toFixed(2)} ({positive ? '+' : ''}{changePct.toFixed(2)}%)
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="hero-stats-meta">
+        <span><strong>{items.length}</strong> unique items</span>
+        <span><strong>{totalUnits}</strong> total units</span>
       </div>
 
       {snapshot && (
