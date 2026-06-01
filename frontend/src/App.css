@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
+:root {
+  --hairline: #e7e9ed;
+  --ink: #16181d;
+  --muted: #999;
+  --muted-strong: #555;
+  --nav-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -19,44 +27,61 @@ body {
 }
 
 @media (max-width: 640px) {
-  .App {
-    padding: 16px 12px;
-  }
-
-  .top-nav {
-    margin-bottom: 16px;
-  }
-}
-
-.app-favicon {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
+  .App { padding: 16px 12px; }
+  .top-nav { margin-bottom: 16px; }
 }
 
 .top-nav {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  height: 56px;
   margin-bottom: 32px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+}
+
+.nav-glyph {
+  display: block;
+  height: 21px;
+  width: auto;
+}
+
+.nav-divider {
+  display: block;
+  width: 1px;
+  height: 20px;
+  background-color: var(--hairline);
+  margin: 0 13px;
+}
+
+.nav-wordmark {
+  font-family: var(--nav-sans);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 4px;
 }
 
 .nav-btn {
   background: none;
   border: none;
-  color: #999;
-  font-size: 15px;
+  color: var(--muted);
+  font-family: var(--nav-sans);
+  font-size: 14px;
   font-weight: 500;
   padding: 4px 8px;
   cursor: pointer;
   transition: color 0.15s;
 }
-
-.nav-btn:hover {
-  color: #555;
-}
-
-.nav-btn.active {
-  color: #1a1a1a;
-}
+.nav-btn:hover { color: var(--muted-strong); }
+.nav-btn.active { color: var(--ink); }

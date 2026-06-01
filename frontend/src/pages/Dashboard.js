@@ -62,10 +62,17 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
+      <div className="hero-card" style={{ backgroundImage: 'url(/cs_banner.png)' }}>
+        <div className="hero-card-overlay" />
+        <div className="hero-card-text">
+          <span className="hero-card-subtitle">COUNTER-STRIKE 2</span>
+          <span className="hero-card-title">CS2 Portfolio</span>
+        </div>
+      </div>
+
       <div className="portfolio-header">
         <div className="portfolio-header-left">
           <div className="portfolio-title">
-            <img src="/favicon.ico" className="app-favicon" alt="" />
             <span className="portfolio-title-label">Portfolio value</span>
           </div>
           <div className="portfolio-value-row">
