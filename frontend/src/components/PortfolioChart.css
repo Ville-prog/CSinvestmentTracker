@@ -41,21 +41,18 @@
   color: #555;
 }
 
-/* active range pill picks up the banner gold */
 .range-btn.active {
   color: var(--cs-gold-deep);
   font-weight: 700;
   background-color: rgba(216, 199, 21, 0.14);
 }
 
-/* the S&P toggle is a benchmark control, not a range — keep it neutral */
 .sp500-btn.active {
   color: #16181d;
   background-color: #f1f3f6;
   font-weight: 600;
 }
 
-/* ---- range summary line ("CS2 -3.65%") — quieted down ---- */
 .chart-summary {
   display: flex;
   gap: 16px;
@@ -73,6 +70,12 @@
 
 .chart-summary-stat.positive { color: var(--chart-pos); }
 .chart-summary-stat.negative { color: var(--chart-neg); }
+
+/* EUR secondary label — matches sign color but de-emphasized */
+.chart-summary-stat.chart-summary-eur {
+  font-size: 13px;
+  font-weight: 500;
+}
 
 /* benchmark stat reads quiet regardless of sign */
 .chart-summary-stat.sp500 {

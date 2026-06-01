@@ -80,6 +80,7 @@ function ChartTooltip({ active, payload, label }) {
 
 function PortfolioChart() {
   const [data, setData] = useState([]);
+  const [eurChange, setEurChange] = useState(null);
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState('1W');
   const [showSp500, setShowSp500] = useState(false);
@@ -140,6 +141,15 @@ function PortfolioChart() {
               }
             }
 
+            const filteredHistory = history.filter(h => h.date >= sp500From);
+            if (filteredHistory.length >= 2) {
+              const firstEur = filteredHistory[0].totalValueEur;
+              const lastEur = filteredHistory[filteredHistory.length - 1].totalValueEur;
+              setEurChange(parseFloat((lastEur - firstEur).toFixed(2)));
+            } else {
+              setEurChange(null);
+            }
+
             setData(merged);
             setLoading(false);
           });
@@ -188,6 +198,11 @@ function PortfolioChart() {
           {portfolioRangeChange != null && (
             <span className={`chart-summary-stat ${portfolioRangeChange > 0 ? 'positive' : portfolioRangeChange < 0 ? 'negative' : ''}`}>
               CS2 {fmt(portfolioRangeChange)}
+            </span>
+          )}
+          {eurChange != null && (
+            <span className={`chart-summary-stat chart-summary-eur ${eurChange > 0 ? 'positive' : eurChange < 0 ? 'negative' : ''}`}>
+              {eurChange > 0 ? '+' : ''}€{eurChange.toFixed(2)}
             </span>
           )}
           {showSp500 && sp500RangeChange != null && (
