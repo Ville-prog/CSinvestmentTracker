@@ -7,6 +7,7 @@
 
 .inventory-table {
   width: 100%;
+  min-width: 580px;
   border-collapse: collapse;
   font-size: 14px;
 }
@@ -70,6 +71,12 @@
   max-width: 280px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+@media (max-width: 640px) {
+  .name-cell {
+    max-width: 140px;
+  }
 }
 
 .name-cell a {
