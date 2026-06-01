@@ -239,7 +239,7 @@ function PortfolioChart() {
             />
             <Legend
               formatter={name => (
-                <span style={{ color: name === 'portfolio' ? '#4f9eff' : '#f0c040', fontSize: 13 }}>
+                <span style={{ color: name === 'portfolio' ? '#4f9eff' : '#e07b00', fontSize: 13 }}>
                   {name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'}
                 </span>
               )}
@@ -250,7 +250,7 @@ function PortfolioChart() {
               <Area
                 type="monotone"
                 dataKey="sp500"
-                stroke="#f0c040"
+                stroke="#e07b00"
                 strokeWidth={2}
                 fill="none"
                 dot={false}
