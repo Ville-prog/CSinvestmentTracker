@@ -215,7 +215,7 @@ function PortfolioChart() {
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
-              tick={{ fill: '#888', fontSize: 12 }}
+              tick={{ fill: '#999', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               minTickGap={60}
@@ -223,7 +223,7 @@ function PortfolioChart() {
             <YAxis
               domain={['dataMin - 2', 'dataMax + 2']}
               tickFormatter={v => `${v > 0 ? '+' : ''}${Math.round(v)}%`}
-              tick={{ fill: '#888', fontSize: 12 }}
+              tick={{ fill: '#999', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={56}
@@ -234,8 +234,8 @@ function PortfolioChart() {
                 name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'
               ]}
               labelFormatter={formatDate}
-              contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 0 }}
-              labelStyle={{ color: '#888' }}
+              contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 0 }}
+              labelStyle={{ color: '#999' }}
             />
             <Legend
               formatter={name => (
@@ -244,8 +244,8 @@ function PortfolioChart() {
                 </span>
               )}
             />
-            <CartesianGrid stroke="#222" strokeDasharray="3 3" vertical={false} />
-            <ReferenceLine y={0} stroke="#333" strokeDasharray="3 3" />
+            <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" vertical={false} />
+            <ReferenceLine y={0} stroke="#bbb" strokeDasharray="3 3" />
             {showSp500 && (
               <Area
                 type="monotone"

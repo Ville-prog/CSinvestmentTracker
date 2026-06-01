@@ -1,7 +1,7 @@
 .table-wrapper {
   overflow-x: auto;
-  background-color: #1a1a1a;
-  border: 1px solid #2a2a2a;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 0;
 }
 
@@ -12,13 +12,13 @@
 }
 
 .inventory-table thead tr {
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .inventory-table th {
   padding: 12px 16px;
   text-align: left;
-  color: #888;
+  color: #999;
   font-weight: 500;
   font-size: 12px;
   text-transform: uppercase;
@@ -32,17 +32,17 @@
 }
 
 .inventory-table th.sortable:hover {
-  color: #ccc;
+  color: #555;
 }
 
 .inventory-table th.active {
-  color: #ffffff;
+  color: #1a1a1a;
 }
 
 .inventory-table td {
   padding: 10px 16px;
-  color: #e0e0e0;
-  border-bottom: 1px solid #1f1f1f;
+  color: #1a1a1a;
+  border-bottom: 1px solid #f0f0f0;
   white-space: nowrap;
 }
 
@@ -51,7 +51,7 @@
 }
 
 .inventory-table tbody tr:hover td {
-  background-color: #212121;
+  background-color: #fafafa;
 }
 
 .icon-cell {
@@ -73,19 +73,19 @@
 }
 
 .name-cell a {
-  color: #e0e0e0;
+  color: #1a1a1a;
   text-decoration: none;
 }
 
 .name-cell a:hover {
-  color: #ffffff;
+  color: #000;
   text-decoration: underline;
 }
 
 .inventory-table td.positive {
-  color: #4caf50;
+  color: #2e7d32;
 }
 
 .inventory-table td.negative {
-  color: #e05c5c;
+  color: #c0392b;
 }

@@ -12,8 +12,8 @@
 
 .range-btn {
   background: none;
-  border: 1px solid #2a2a2a;
-  color: #888;
+  border: 1px solid #e0e0e0;
+  color: #999;
   padding: 4px 12px;
   border-radius: 0;
   cursor: pointer;
@@ -23,13 +23,13 @@
 }
 
 .range-btn:hover {
-  border-color: #444;
-  color: #ccc;
+  border-color: #bbb;
+  color: #555;
 }
 
 .range-btn.active {
-  border-color: #ffffff;
-  color: #ffffff;
+  border-color: #1a1a1a;
+  color: #1a1a1a;
 }
 
 .chart-summary {
@@ -41,21 +41,21 @@
 .chart-summary-stat {
   font-size: 22px;
   font-weight: 600;
-  color: #888;
+  color: #999;
 }
 
 .chart-summary-stat.positive {
-  color: #4caf50;
+  color: #2e7d32;
 }
 
 .chart-summary-stat.negative {
-  color: #e05c5c;
+  color: #c0392b;
 }
 
 .chart-summary-stat.sp500.positive {
-  color: #f0c040;
+  color: #b07d00;
 }
 
 .chart-summary-stat.sp500.negative {
-  color: #e05c5c;
+  color: #c0392b;
 }

@@ -127,14 +127,14 @@ function PortfolioValueChart() {
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
-              tick={{ fill: '#888', fontSize: 12 }}
+              tick={{ fill: '#999', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               minTickGap={60}
             />
             <YAxis
               tickFormatter={v => `€${v.toLocaleString('fi-FI', { maximumFractionDigits: 0 })}`}
-              tick={{ fill: '#888', fontSize: 12 }}
+              tick={{ fill: '#999', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={72}
@@ -142,10 +142,10 @@ function PortfolioValueChart() {
             <Tooltip
               formatter={value => [`€${value.toFixed(2)}`, 'Portfolio Value']}
               labelFormatter={formatDate}
-              contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 0 }}
-              labelStyle={{ color: '#888' }}
+              contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 0 }}
+              labelStyle={{ color: '#999' }}
             />
-            <CartesianGrid stroke="#222" strokeDasharray="3 3" vertical={false} />
+            <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" vertical={false} />
             <Area type="monotone" dataKey="value" stroke="#4f9eff" strokeWidth={2} fill="url(#valueGradient)" dot={false} activeDot={{ r: 4 }} />
           </AreaChart>
         </ResponsiveContainer>
