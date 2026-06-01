@@ -28,7 +28,9 @@
 
 .range-btn.active {
   color: #1a1a1a;
-  font-weight: 700;
+  font-weight: 600;
+  background-color: #e8e8e8;
+  border-radius: 4px;
 }
 
 .chart-summary {
