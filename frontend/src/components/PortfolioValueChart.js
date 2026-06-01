@@ -32,6 +32,13 @@ const RANGES = [
   { label: '1W', weeks: 1 },
 ];
 
+/**
+ * @brief Returns an ISO date string for the start of the given range.
+ *        Supports month-based and week-based ranges. Returns the CS:GO skin market launch date for Max.
+ *
+ * @param {{ months: number|null, weeks?: number }} range Range object from the RANGES array
+ * @returns {string} ISO date string (YYYY-MM-DD)
+ */
 function fromDate(range) {
   if (range.months === null) return '2013-08-13';
   const d = new Date();
@@ -43,11 +50,25 @@ function fromDate(range) {
   return d.toISOString().split('T')[0];
 }
 
+/**
+ * @brief Formats an ISO date string into DD.MM.YYYY format.
+ *
+ * @param {string} dateStr ISO date string (YYYY-MM-DD)
+ * @returns {string} Formatted date label (e.g. "12.04.2026")
+ */
 function formatDate(dateStr) {
   const [year, month, day] = dateStr.split('-');
   return `${day}.${month}.${year}`;
 }
 
+/**
+ * @brief Flat custom tooltip — square corners, gold dot on the EUR value.
+ *
+ * @param {boolean} active Whether the tooltip is currently visible
+ * @param {object[]} payload Recharts payload array containing the hovered data point
+ * @param {string} label The date string for the hovered x-axis position
+ * @returns {JSX.Element|null}
+ */
 function ValueTooltip({ active, payload, label }) {
   if (!active || !payload || payload.length === 0) return null;
   const v = payload[0]?.value;
@@ -63,6 +84,12 @@ function ValueTooltip({ active, payload, label }) {
   );
 }
 
+/**
+ * @brief Chart fetching portfolio history and rendering total EUR value over the selected range.
+ *        The chart summary shows the absolute EUR change from the first to the last point in range.
+ *
+ * @returns {JSX.Element} The portfolio total value chart with range selector buttons
+ */
 function PortfolioValueChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);

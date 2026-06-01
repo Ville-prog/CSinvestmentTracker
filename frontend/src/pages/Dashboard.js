@@ -1,3 +1,12 @@
+/**
+ * Dashboard.js
+ *
+ * Main dashboard page showing portfolio value, key stats, performance charts, and inventory.
+ * Fetches portfolio history, inventory items, the latest snapshot, and 7-day S&P 500 data on mount.
+ *
+ * @author Ville Laaksoaho
+ * Dependencies: PortfolioChart.js, PortfolioValueChart.js, InventoryTable.js, Dashboard.css
+ */
 import { useEffect, useState } from 'react';
 import PortfolioChart from '../components/PortfolioChart';
 import PortfolioValueChart from '../components/PortfolioValueChart';
@@ -6,6 +15,11 @@ import './Dashboard.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
+/**
+ * @brief Fetches all portfolio data and renders the hero card, header stats, chart tabs, and inventory table.
+ *
+ * @returns {JSX.Element} The dashboard page
+ */
 function Dashboard() {
   const [snapshot, setSnapshot] = useState(null);
   const [items, setItems] = useState([]);

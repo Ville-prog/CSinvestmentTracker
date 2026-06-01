@@ -1,3 +1,11 @@
+/**
+ * InventoryTable.test.js
+ *
+ * Unit tests for the InventoryTable component covering rendering, P&L class application, and sort behaviour.
+ *
+ * @author Ville Laaksoaho
+ * Dependencies: InventoryTable.js, @testing-library/react, @testing-library/user-event
+ */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import InventoryTable from './InventoryTable';

@@ -35,6 +35,13 @@ const RANGES = [
   { label: '1W', weeks: 1 },
 ];
 
+/**
+ * @brief Returns an ISO date string for the start of the given range.
+ *        Supports month-based and week-based ranges. Returns the CS:GO skin market launch date for Max.
+ *
+ * @param {{ months: number|null, weeks?: number }} range Range object from the RANGES array
+ * @returns {string} ISO date string (YYYY-MM-DD)
+ */
 function fromDate(range) {
   if (range.months === null) return '2013-08-13';
   const d = new Date();
@@ -46,6 +53,13 @@ function fromDate(range) {
   return d.toISOString().split('T')[0];
 }
 
+/**
+ * @brief Normalizes a list of data points to percentage change from the first value.
+ *
+ * @param {{ date: string, [valueKey]: number }[]} dataPoints Array of data point objects
+ * @param {string} valueKey The key to normalize on
+ * @returns {{ date: string, pct: number }[]} Normalized data points with percentage change
+ */
 function normalize(dataPoints, valueKey) {
   const valid = dataPoints.filter(p => p[valueKey] != null);
   if (valid.length === 0) return [];
@@ -57,11 +71,25 @@ function normalize(dataPoints, valueKey) {
   }));
 }
 
+/**
+ * @brief Formats an ISO date string into DD.MM.YYYY format.
+ *
+ * @param {string} dateStr ISO date string (YYYY-MM-DD)
+ * @returns {string} Formatted date label (e.g. "12.04.2026")
+ */
 function formatDate(dateStr) {
   const [year, month, day] = dateStr.split('-');
   return `${day}.${month}.${year}`;
 }
 
+/**
+ * @brief Flat custom tooltip showing CS2 P&L % and optionally S&P 500 % for the hovered date.
+ *
+ * @param {boolean} active Whether the tooltip is currently visible
+ * @param {object[]} payload Recharts payload array containing the hovered data point
+ * @param {string} label The date string for the hovered x-axis position
+ * @returns {JSX.Element|null}
+ */
 function ChartTooltip({ active, payload, label }) {
   if (!active || !payload || payload.length === 0) return null;
   const fmtPct = v => (v == null ? 'N/A' : `${v > 0 ? '+' : ''}${v}%`);
@@ -78,6 +106,12 @@ function ChartTooltip({ active, payload, label }) {
   );
 }
 
+/**
+ * @brief Chart fetching portfolio history and S&P 500 data and rendering P&L % over the selected range.
+ *        The chart summary shows range-based % and EUR change, with an optional S&P 500 overlay.
+ *
+ * @returns {JSX.Element} The portfolio P&L chart with range selector and optional S&P 500 overlay
+ */
 function PortfolioChart() {
   const [data, setData] = useState([]);
   const [eurChange, setEurChange] = useState(null);
