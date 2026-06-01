@@ -64,13 +64,6 @@ function Dashboard() {
       <div className="hero-stats">
         <div className="hero-stats-value">
           €{totalValue.toFixed(2)}
-          {dailyChange != null && (
-            <span className={`hero-stats-change ${dailyChange < 0 ? 'negative' : ''}`}>
-              {dailyChange >= 0 ? '▲' : '▼'} {dailyChange >= 0 ? '+' : ''}€{Math.abs(dailyChange).toFixed(2)}
-              {dailyChangePct != null && `(${dailyChangePct >= 0 ? '+' : ''}${dailyChangePct.toFixed(2)}%)`}
-              <span className={`hero-stats-change-tag ${dailyChange < 0 ? 'negative' : ''}`}>24H</span>
-            </span>
-          )}
         </div>
         <div className="hero-stats-meta">
           <span><strong>{items.length}</strong> unique items</span>
