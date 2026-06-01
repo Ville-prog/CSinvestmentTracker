@@ -1,3 +1,15 @@
+:root {
+  --cs-gold: #d8c715;
+  --cs-gold-deep: #a8990c;
+  --cs-ink: #231f1c;
+  --chart-bench: #bdb6a5;
+  --chart-grid: #f1f3f6;
+  --chart-hair: #d7dade;     
+  --chart-axis: #9aa0ab;     
+  --chart-pos: #1c7a4d;      
+  --chart-neg: #bb3b2c;      
+}
+
 .chart-controls {
   display: flex;
   justify-content: space-between;
@@ -9,57 +21,103 @@
 
 .chart-range-buttons {
   display: flex;
-  gap: 8px;
+  gap: 2px;
 }
 
 .range-btn {
   background: none;
   border: none;
-  color: #aaa;
-  padding: 4px 8px;
+  color: #9aa0ab;
+  padding: 5px 10px;
   cursor: pointer;
   font-size: 13px;
   font-family: inherit;
   font-weight: 500;
-  transition: color 0.15s;
+  border-radius: 4px;
+  transition: color 0.15s, background-color 0.15s;
 }
 
 .range-btn:hover {
   color: #555;
 }
 
+/* active range pill picks up the banner gold */
 .range-btn.active {
-  color: #1a1a1a;
-  font-weight: 600;
-  background-color: #e8e8e8;
-  border-radius: 4px;
+  color: var(--cs-gold-deep);
+  font-weight: 700;
+  background-color: rgba(216, 199, 21, 0.14);
 }
 
+/* the S&P toggle is a benchmark control, not a range — keep it neutral */
+.sp500-btn.active {
+  color: #16181d;
+  background-color: #f1f3f6;
+  font-weight: 600;
+}
+
+/* ---- range summary line ("CS2 -3.65%") — quieted down ---- */
 .chart-summary {
   display: flex;
-  gap: 20px;
-  margin-top: 4px;
-  margin-bottom: 20px;
+  gap: 16px;
+  align-items: baseline;
+  margin-top: 6px;
+  margin-bottom: 14px;
 }
 
 .chart-summary-stat {
-  font-size: 22px;
+  font-size: 15px;
   font-weight: 600;
-  color: #999;
+  color: #595d66;
+  font-variant-numeric: tabular-nums;
 }
 
-.chart-summary-stat.positive {
-  color: #2e7d32;
+.chart-summary-stat.positive { color: var(--chart-pos); }
+.chart-summary-stat.negative { color: var(--chart-neg); }
+
+/* benchmark stat reads quiet regardless of sign */
+.chart-summary-stat.sp500 {
+  font-size: 13px;
+  font-weight: 500;
+  color: #9aa0ab;
+}
+.chart-summary-stat.sp500.positive,
+.chart-summary-stat.sp500.negative { color: #9aa0ab; }
+
+.chart-tip {
+  background: #ffffff;
+  border: 1px solid var(--chart-hair);
+  padding: 8px 11px;
+  box-shadow: 0 6px 18px -12px rgba(20, 22, 28, 0.4);
 }
 
-.chart-summary-stat.negative {
-  color: #c0392b;
+.chart-tip-date {
+  font-size: 11px;
+  color: var(--chart-axis);
+  margin-bottom: 5px;
 }
 
-.chart-summary-stat.sp500.positive {
-  color: #e07b00;
+.chart-tip-row {
+  display: flex;
+  gap: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-.chart-summary-stat.sp500.negative {
-  color: #c0392b;
+.chart-tip-cs2 { color: var(--cs-ink); }
+.chart-tip-cs2 .dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--cs-gold);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.chart-tip-sp { color: var(--chart-axis); font-weight: 500; }
+
+.status-text {
+  color: #9aa0ab;
+  font-size: 14px;
+  padding: 40px 0;
+  text-align: center;
 }

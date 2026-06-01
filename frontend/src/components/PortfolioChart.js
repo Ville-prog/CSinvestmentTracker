@@ -1,8 +1,11 @@
 /**
  * PortfolioChart.js
  *
- * Area chart comparing CS2 portfolio P&L against the S&P 500 over a selected time range.
+ * Line+area chart comparing CS2 portfolio P&L against the S&P 500 over a selected time range.
  * Both series display percentage change from the first point in the selected range.
+ *
+ * Palette is tied to the Counter-Strike banner: warm-ink portfolio line, CS-gold area
+ * wash + accents, neutral warm-gray benchmark. Colors live as CSS tokens in PortfolioChart.css.
  *
  * @author Ville Laaksoaho
  * Dependencies: recharts, PortfolioChart.css
@@ -10,11 +13,18 @@
 import { useEffect, useState } from 'react';
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip,
-  ResponsiveContainer, ReferenceLine, Legend, CartesianGrid
+  ResponsiveContainer, ReferenceLine, CartesianGrid
 } from 'recharts';
 import './PortfolioChart.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
+const COLOR_LINE = '#231f1c';   // --cs-ink
+const COLOR_GOLD = '#d8c715';   // --cs-gold
+const COLOR_BENCH = '#bdb6a5';  // --chart-bench
+const COLOR_GRID = '#f1f3f6';   // --chart-grid
+const COLOR_HAIR = '#d7dade';   // --chart-hair
+const COLOR_AXIS = '#9aa0ab';   // --chart-axis
 
 const RANGES = [
   { label: 'Max', months: null },
@@ -25,13 +35,6 @@ const RANGES = [
   { label: '1W', weeks: 1 },
 ];
 
-/**
- * @brief Returns an ISO date string for the start of the given range.
- *        Supports month-based and week-based ranges. Returns the CS:GO skin market launch date for Max.
- *
- * @param {{ months: number|null, weeks?: number }} range Range object from the RANGES array
- * @returns {string} ISO date string (YYYY-MM-DD)
- */
 function fromDate(range) {
   if (range.months === null) return '2013-08-13';
   const d = new Date();
@@ -43,13 +46,6 @@ function fromDate(range) {
   return d.toISOString().split('T')[0];
 }
 
-/**
- * @brief Normalizes a list of data points to percentage change from the first value.
- *
- * @param {{ date: string, [valueKey]: number }[]} dataPoints Array of data point objects
- * @param {string} valueKey The key to normalize on
- * @returns {{ date: string, pct: number }[]} Normalized data points with percentage change
- */
 function normalize(dataPoints, valueKey) {
   const valid = dataPoints.filter(p => p[valueKey] != null);
   if (valid.length === 0) return [];
@@ -61,24 +57,27 @@ function normalize(dataPoints, valueKey) {
   }));
 }
 
-/**
- * @brief Formats an ISO date string into DD.MM.YYYY format.
- *
- * @param {string} dateStr ISO date string (YYYY-MM-DD)
- * @returns {string} Formatted date label (e.g. "12.04.2026")
- */
 function formatDate(dateStr) {
   const [year, month, day] = dateStr.split('-');
   return `${day}.${month}.${year}`;
 }
 
-/**
- * @brief Area chart fetching portfolio history and S&P 500 data and rendering P&L % over the selected range.
- *        The chart summary shows range-based change (last minus first point). The S&P 500 toggle renders
- *        as a transparent-fill area so it displays correctly inside Recharts AreaChart.
- *
- * @returns {JSX.Element} The portfolio P&L chart with range selector and optional S&P 500 overlay
- */
+function ChartTooltip({ active, payload, label }) {
+  if (!active || !payload || payload.length === 0) return null;
+  const fmtPct = v => (v == null ? 'N/A' : `${v > 0 ? '+' : ''}${v}%`);
+  const cs2 = payload.find(p => p.dataKey === 'portfolio');
+  const sp = payload.find(p => p.dataKey === 'sp500');
+  return (
+    <div className="chart-tip">
+      <div className="chart-tip-date">{formatDate(label)}</div>
+      <div className="chart-tip-row">
+        {cs2 && <span className="chart-tip-cs2"><span className="dot" />CS2 {fmtPct(cs2.value)}</span>}
+        {sp && sp.value != null && <span className="chart-tip-sp">S&amp;P {fmtPct(sp.value)}</span>}
+      </div>
+    </div>
+  );
+}
+
 function PortfolioChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -207,15 +206,15 @@ function PortfolioChart() {
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
             <defs>
-              <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#4f9eff" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#4f9eff" stopOpacity={0} />
+              <linearGradient id="portfolioGoldWash" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={COLOR_GOLD} stopOpacity={0.28} />
+                <stop offset="100%" stopColor={COLOR_GOLD} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
-              tick={{ fill: '#999', fontSize: 12 }}
+              tick={{ fill: COLOR_AXIS, fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               minTickGap={60}
@@ -223,50 +222,39 @@ function PortfolioChart() {
             <YAxis
               domain={['dataMin - 2', 'dataMax + 2']}
               tickFormatter={v => `${v > 0 ? '+' : ''}${Math.round(v)}%`}
-              tick={{ fill: '#999', fontSize: 12 }}
+              tick={{ fill: COLOR_AXIS, fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={56}
             />
+            <CartesianGrid stroke={COLOR_GRID} vertical={false} />
+            <ReferenceLine y={0} stroke={COLOR_HAIR} />
             <Tooltip
-              formatter={(value, name) => [
-                value != null ? `${value > 0 ? '+' : ''}${value}%` : 'N/A',
-                name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'
-              ]}
-              labelFormatter={formatDate}
-              contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 0 }}
-              labelStyle={{ color: '#999' }}
+              content={<ChartTooltip />}
+              cursor={{ stroke: COLOR_GOLD, strokeWidth: 1 }}
             />
-            <Legend
-              formatter={name => (
-                <span style={{ color: name === 'portfolio' ? '#4f9eff' : '#e07b00', fontSize: 13 }}>
-                  {name === 'portfolio' ? 'CS2 Portfolio P&L' : 'S&P 500'}
-                </span>
-              )}
-            />
-            <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" vertical={false} />
-            <ReferenceLine y={0} stroke="#bbb" strokeDasharray="3 3" />
             {showSp500 && (
               <Area
                 type="monotone"
                 dataKey="sp500"
-                stroke="#e07b00"
-                strokeWidth={2}
+                stroke={COLOR_BENCH}
+                strokeWidth={1.5}
+                strokeDasharray="4 4"
                 fill="none"
                 dot={false}
-                activeDot={{ r: 4 }}
+                activeDot={{ r: 3, fill: '#fff', stroke: COLOR_BENCH, strokeWidth: 1.5 }}
                 connectNulls
               />
             )}
             <Area
               type="monotone"
               dataKey="portfolio"
-              stroke="#4f9eff"
-              strokeWidth={2}
-              fill="url(#portfolioGradient)"
+              stroke={COLOR_LINE}
+              strokeWidth={1.9}
+              fill="url(#portfolioGoldWash)"
               baseValue="dataMin"
               dot={false}
-              activeDot={{ r: 4 }}
+              activeDot={{ r: 4, fill: '#fff', stroke: COLOR_GOLD, strokeWidth: 2.2 }}
               connectNulls
             />
           </AreaChart>

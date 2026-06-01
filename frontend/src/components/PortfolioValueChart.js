@@ -1,8 +1,10 @@
 /**
  * PortfolioValueChart.js
  *
- * Area chart showing raw CS2 portfolio value in EUR over a selected time range.
+ * Line+area chart showing raw CS2 portfolio value in EUR over a selected time range.
  * Unlike the P&L chart, this shows absolute value including the effect of adding new items.
+ *
+ * Shares the banner palette with PortfolioChart: warm-ink line, CS-gold area wash + accents.
  *
  * @author Ville Laaksoaho
  * Dependencies: recharts, PortfolioChart.css
@@ -16,6 +18,11 @@ import './PortfolioChart.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
+const COLOR_LINE = '#231f1c';   // --cs-ink
+const COLOR_GOLD = '#d8c715';   // --cs-gold
+const COLOR_GRID = '#f1f3f6';   // --chart-grid
+const COLOR_AXIS = '#9aa0ab';   // --chart-axis
+
 const RANGES = [
   { label: 'Max', months: null },
   { label: '1Y', months: 12 },
@@ -25,13 +32,6 @@ const RANGES = [
   { label: '1W', weeks: 1 },
 ];
 
-/**
- * @brief Returns an ISO date string for the start of the given range.
- *        Supports month-based and week-based ranges. Returns the CS:GO skin market launch date for Max.
- *
- * @param {{ months: number|null, weeks?: number }} range Range object from the RANGES array
- * @returns {string} ISO date string (YYYY-MM-DD)
- */
 function fromDate(range) {
   if (range.months === null) return '2013-08-13';
   const d = new Date();
@@ -43,23 +43,26 @@ function fromDate(range) {
   return d.toISOString().split('T')[0];
 }
 
-/**
- * @brief Formats an ISO date string into DD.MM.YYYY format.
- *
- * @param {string} dateStr ISO date string (YYYY-MM-DD)
- * @returns {string} Formatted date label (e.g. "12.04.2026")
- */
 function formatDate(dateStr) {
   const [year, month, day] = dateStr.split('-');
   return `${day}.${month}.${year}`;
 }
 
-/**
- * @brief Area chart fetching portfolio history and rendering total EUR value over the selected range.
- *        The chart summary shows the absolute EUR change from the first to the last point in range.
- *
- * @returns {JSX.Element} The portfolio total value chart with range selector buttons
- */
+function ValueTooltip({ active, payload, label }) {
+  if (!active || !payload || payload.length === 0) return null;
+  const v = payload[0]?.value;
+  return (
+    <div className="chart-tip">
+      <div className="chart-tip-date">{formatDate(label)}</div>
+      <div className="chart-tip-row">
+        <span className="chart-tip-cs2">
+          <span className="dot" />€{v != null ? v.toFixed(2) : 'N/A'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function PortfolioValueChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -119,34 +122,40 @@ function PortfolioValueChart() {
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
             <defs>
-              <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#4f9eff" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#4f9eff" stopOpacity={0} />
+              <linearGradient id="valueGoldWash" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={COLOR_GOLD} stopOpacity={0.28} />
+                <stop offset="100%" stopColor={COLOR_GOLD} stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
-              tick={{ fill: '#999', fontSize: 12 }}
+              tick={{ fill: COLOR_AXIS, fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               minTickGap={60}
             />
             <YAxis
               tickFormatter={v => `€${v.toLocaleString('fi-FI', { maximumFractionDigits: 0 })}`}
-              tick={{ fill: '#999', fontSize: 12 }}
+              tick={{ fill: COLOR_AXIS, fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={72}
             />
+            <CartesianGrid stroke={COLOR_GRID} vertical={false} />
             <Tooltip
-              formatter={value => [`€${value.toFixed(2)}`, 'Portfolio Value']}
-              labelFormatter={formatDate}
-              contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e0e0e0', borderRadius: 0 }}
-              labelStyle={{ color: '#999' }}
+              content={<ValueTooltip />}
+              cursor={{ stroke: COLOR_GOLD, strokeWidth: 1 }}
             />
-            <CartesianGrid stroke="#e0e0e0" strokeDasharray="3 3" vertical={false} />
-            <Area type="monotone" dataKey="value" stroke="#4f9eff" strokeWidth={2} fill="url(#valueGradient)" dot={false} activeDot={{ r: 4 }} />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke={COLOR_LINE}
+              strokeWidth={1.9}
+              fill="url(#valueGoldWash)"
+              dot={false}
+              activeDot={{ r: 4, fill: '#fff', stroke: COLOR_GOLD, strokeWidth: 2.2 }}
+            />
           </AreaChart>
         </ResponsiveContainer>
       )}
