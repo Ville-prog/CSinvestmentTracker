@@ -52,7 +52,7 @@
 }
 
 .inventory-table tbody tr:hover td {
-  background-color: #fafafa;
+  background-color: rgba(216, 199, 21, 0.10);
 }
 
 .icon-cell {
