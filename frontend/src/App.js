@@ -24,8 +24,6 @@ function App() {
       <nav className="top-nav">
         <div className="nav-brand">
           <img src="/cs_logo_ink.png" alt="CS" className="nav-glyph" />
-          <span className="nav-divider" />
-          <span className="nav-wordmark">CS2 Portfolio</span>
         </div>
         <div className="nav-links">
           <button
