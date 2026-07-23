@@ -18,7 +18,7 @@ import './PortfolioChart.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
-const COLOR_LINE = '#4f9eff';
+const COLOR_LINE = '#78a6d8';
 const COLOR_GRID = '#222';
 const COLOR_AXIS = '#888';
 const COLOR_HAIR = '#333';
@@ -149,7 +149,7 @@ function PortfolioValueChart() {
           <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
             <defs>
               <linearGradient id="valueBlueWash" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={COLOR_LINE} stopOpacity={0.25} />
+                <stop offset="5%" stopColor={COLOR_LINE} stopOpacity={0.14} />
                 <stop offset="95%" stopColor={COLOR_LINE} stopOpacity={0} />
               </linearGradient>
             </defs>

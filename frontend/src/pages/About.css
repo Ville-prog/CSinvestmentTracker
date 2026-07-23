@@ -5,13 +5,13 @@
   padding: 24px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
 }
 
 .about-heading {
-  color: #fff;
+  color: var(--ink);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .about-section p {
@@ -25,7 +25,7 @@
   padding: 12px 16px;
   background: #111;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 2px;
   color: var(--ink);
   font-family: "Courier New", monospace;
   font-size: 13px;

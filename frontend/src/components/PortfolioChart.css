@@ -3,35 +3,35 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .chart-range-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 18px;
 }
 
 .range-btn {
-  padding: 4px 12px;
+  padding: 2px 0;
   background: none;
-  border: 1px solid var(--border);
-  border-radius: 4px;
+  border: 0;
+  border-bottom: 1px solid transparent;
   color: var(--muted);
   cursor: pointer;
-  font-size: 13px;
-  transition: all .15s;
+  font-size: 11px;
 }
 
 .range-btn:hover {
-  border-color: #444;
   color: #ccc;
 }
 
 .range-btn.active {
-  border-color: #fff;
-  color: #fff;
+  border-bottom-color: var(--ink);
+  color: var(--ink);
 }
+
+.sp500-btn { padding-right: 0; }
 
 .chart-summary {
   display: flex;
@@ -42,8 +42,9 @@
 
 .chart-summary-stat {
   color: var(--muted);
-  font-size: 22px;
-  font-weight: 600;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 18px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
 
@@ -56,19 +57,19 @@
 }
 
 .chart-summary-stat.sp500 {
-  color: #f0c040;
+  color: #bda961;
   font-size: 14px;
   font-weight: 500;
 }
 
 .chart-summary-stat.sp500.positive,
-.chart-summary-stat.sp500.negative { color: #f0c040; }
+.chart-summary-stat.sp500.negative { color: #bda961; }
 
 .chart-tip {
   padding: 9px 12px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 2px;
 }
 
 .chart-tip-date {
@@ -84,20 +85,20 @@
   font-weight: 600;
 }
 
-.chart-tip-cs2 { color: #4f9eff; }
+.chart-tip-cs2 { color: #78a6d8; }
 
 .chart-tip-cs2 .dot {
   display: inline-block;
   width: 8px;
   height: 8px;
   margin-right: 6px;
-  background: #4f9eff;
+  background: #78a6d8;
   border-radius: 50%;
   vertical-align: middle;
 }
 
 .chart-tip-sp {
-  color: #f0c040;
+  color: #bda961;
   font-weight: 500;
 }
 
@@ -111,6 +112,6 @@
 @media (max-width: 640px) {
   .chart-controls { align-items: flex-start; }
   .chart-range-buttons { gap: 4px; }
-  .range-btn { padding: 4px 8px; font-size: 12px; }
+  .range-btn { margin-right: 10px; padding: 3px 0; font-size: 11px; }
   .chart-summary-stat { font-size: 18px; }
 }

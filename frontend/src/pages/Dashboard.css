@@ -1,13 +1,14 @@
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
 .page-title {
-  color: #fff;
-  font-size: 28px;
-  font-weight: 600;
+  color: var(--ink);
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: -.02em;
 }
 
 .snapshot-date {
@@ -16,34 +17,40 @@
 }
 
 .stat-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  margin-top: 4px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 .stat-card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 180px;
-  padding: 24px 32px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  gap: 7px;
+  min-width: 0;
+  padding: 18px 20px;
+  border-right: 1px solid var(--border);
 }
+
+.stat-card:first-child { padding-left: 0; }
+.stat-card:last-child { border-right: 0; }
 
 .stat-label {
   color: var(--muted);
-  font-size: 13px;
-  letter-spacing: .05em;
+  font-size: 10px;
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
 
 .stat-value {
-  color: #fff;
-  font-size: 32px;
-  font-weight: 700;
+  color: var(--ink);
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 27px;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -.04em;
 }
 
 .chart-tabs {
@@ -52,14 +59,14 @@
 }
 
 .chart-tab {
-  padding: 6px 12px;
+  padding: 6px 0;
+  margin-right: 16px;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
   color: var(--muted);
   cursor: pointer;
-  font-size: 14px;
-  transition: all .15s;
+  font-size: 12px;
 }
 
 .chart-tab:hover { color: #ccc; }
@@ -70,17 +77,17 @@
 }
 
 .chart-wrapper {
-  padding: 24px 16px 16px;
+  padding: 20px 14px 12px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 2px;
 }
 
 .section-title {
   margin-bottom: -8px;
-  color: #fff;
-  font-size: 18px;
-  font-weight: 600;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .status-text {
@@ -96,17 +103,21 @@
   .dashboard { gap: 18px; }
 
   .stat-cards {
-    display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
   }
 
   .stat-card {
-    min-width: 0;
-    padding: 18px;
+    padding: 15px 14px;
   }
 
-  .stat-card:first-child { grid-column: 1 / -1; }
-  .stat-value { font-size: 26px; }
+  .stat-card:first-child {
+    grid-column: 1 / -1;
+    padding-left: 14px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-card:nth-child(2) { border-right: 1px solid var(--border); }
+  .stat-value { font-size: 24px; }
   .chart-wrapper { padding: 18px 8px 10px; }
 }
