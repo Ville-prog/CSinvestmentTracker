@@ -1,67 +1,48 @@
-.dashboard > .page-title {
-  margin-bottom: 56px;
-}
-
 .about-section {
-  display: grid;
-  grid-template-columns: minmax(160px, 1fr) minmax(0, 3fr);
-  gap: 32px;
-  padding: 28px 0;
-  border-top: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
 }
 
 .about-heading {
-  margin: 0;
-  color: var(--ink);
+  color: #fff;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .about-section p {
-  grid-column: 2;
-  margin: 0;
-  color: #4f4e49;
-  line-height: 1.7;
+  color: #aaa;
   font-size: 14px;
+  line-height: 1.65;
 }
 
 .about-formula {
-  grid-column: 2;
-  margin: 2px 0;
-  padding: 12px 0;
-  border-top: 1px solid var(--hairline);
-  border-bottom: 1px solid var(--hairline);
-  font-size: 13px;
-  color: var(--ink);
-  font-family: var(--mono);
   overflow-x: auto;
+  padding: 12px 16px;
+  background: #111;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--ink);
+  font-family: "Courier New", monospace;
+  font-size: 13px;
   white-space: pre;
 }
 
 .about-list {
-  grid-column: 2;
-  margin: 0;
-  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
 }
 
 .about-list li {
-  margin-bottom: 8px;
-  color: #4f4e49;
+  color: #aaa;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .about-list li strong { color: var(--ink); }
-
-@media (max-width: 640px) {
-  .dashboard > .page-title { margin-bottom: 40px; }
-
-  .about-section {
-    display: block;
-    padding: 24px 0;
-  }
-
-  .about-heading { margin-bottom: 16px; }
-  .about-section p + p { margin-top: 12px; }
-  .about-formula { margin: 14px 0; }
-}

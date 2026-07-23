@@ -32,7 +32,7 @@ function About() {
 
       <div className="about-section">
         <h2 className="about-heading">How it works</h2>
-        <p>A daily job runs at 5 AM UTC (8 AM Finnish time) and fetches the Steam inventory, upserting any newly discovered items into the database. It then collects the current Steam Market price for every tracked item in the database, not only the items returned by today's Steam response, so transient gaps or truncations in the Steam API don't distort the portfolio value.</p>
+        <p>A scheduled job runs at 05:00 UTC on the first day of every month (07:00 Finnish time in winter and 08:00 in summer). It fetches the Steam inventory and upserts newly discovered items into the database, then collects the current Steam Market price for every tracked item—not only those returned by the latest Steam response. Each run records one monthly portfolio snapshot, while the defensive database-based pricing prevents transient Steam API gaps from distorting its value.</p>
         <p>Each item carries a last-seen timestamp that is advanced whenever it appears in a sane Steam response. Items missing for more than 7 days are considered traded away, and a sanity gate protects against one bad Steam day silently ageing out the whole inventory.</p>
         <p>Steam's Market API is rate limited with no official pricing endpoint, so the job fetches one price every 4 seconds. This is the compliant approach. Many third-party sites bypass this by running networks of Steam bot accounts, which violates Steam's Terms of Service.</p>
       </div>
@@ -57,11 +57,11 @@ function About() {
       <div className="about-section">
         <h2 className="about-heading">Limitations</h2>
         <ul className="about-list">
-          <li><strong>Historical data:</strong> The app only shows data from when tracking began. There is no way to backfill historical portfolio value before the first nightly run.</li>
+          <li><strong>Historical data:</strong> The app only shows data from when tracking began. There is no way to backfill portfolio value before the first collection run, and scheduled data points are now recorded monthly.</li>
           <li><strong>Storage Containers:</strong> Items stored inside Steam Storage Containers are not visible to the API and cannot be tracked.</li>
           <li><strong>Trade cooldowns:</strong> Newly traded items have a 7-day market cooldown and are skipped until they become marketable.</li>
           <li><strong>Single inventory:</strong> The app currently tracks one hardcoded Steam inventory.</li>
-          <li><strong>Trade-out detection delay:</strong> Since items missing from a single Steam response are still priced from the DB, truly traded-away items are only recognised after 7 consecutive days outside the inventory response.</li>
+          <li><strong>Trade-out detection delay:</strong> Since items missing from a Steam response are still priced from the database, a traded-away item is not recognised until a later monthly collection finds that its last-seen date is more than 7 days old.</li>
         </ul>
       </div>
     </div>

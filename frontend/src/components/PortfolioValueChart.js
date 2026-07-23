@@ -18,10 +18,10 @@ import './PortfolioChart.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
-const COLOR_LINE = '#171715';
-const COLOR_GRID = '#e5e3dc';
-const COLOR_AXIS = '#74736d';
-const COLOR_HAIR = '#cfcdc5';
+const COLOR_LINE = '#4f9eff';
+const COLOR_GRID = '#222';
+const COLOR_AXIS = '#888';
+const COLOR_HAIR = '#333';
 
 const RANGES = [
   { label: 'Max', months: null },
@@ -29,7 +29,6 @@ const RANGES = [
   { label: '6M', months: 6 },
   { label: '3M', months: 3 },
   { label: '1M', months: 1 },
-  { label: '1W', weeks: 1 },
 ];
 
 /**
@@ -93,7 +92,7 @@ function ValueTooltip({ active, payload, label }) {
 function PortfolioValueChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [range, setRange] = useState('1W');
+  const [range, setRange] = useState('1M');
 
   useEffect(() => {
     const selectedRange = RANGES.find(r => r.label === range);
@@ -148,6 +147,12 @@ function PortfolioValueChart() {
       ) : (
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
+            <defs>
+              <linearGradient id="valueBlueWash" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={COLOR_LINE} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={COLOR_LINE} stopOpacity={0} />
+              </linearGradient>
+            </defs>
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
@@ -172,10 +177,10 @@ function PortfolioValueChart() {
               type="monotone"
               dataKey="value"
               stroke={COLOR_LINE}
-              strokeWidth={1.5}
-              fill="none"
+              strokeWidth={2}
+              fill="url(#valueBlueWash)"
               dot={false}
-              activeDot={{ r: 3, fill: '#f4f3ef', stroke: COLOR_LINE, strokeWidth: 1.5 }}
+              activeDot={{ r: 4 }}
             />
           </AreaChart>
         </ResponsiveContainer>

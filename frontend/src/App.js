@@ -22,24 +22,18 @@ function App() {
   return (
     <div className="App">
       <nav className="top-nav">
-        <div className="nav-brand">
-          <img src="/cs_logo_ink.png" alt="CS" className="nav-glyph" />
-          <span className="nav-wordmark">Investment tracker</span>
-        </div>
-        <div className="nav-links">
-          <button
-            className={`nav-btn ${page === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setPage('dashboard')}
-          >
-            Portfolio
-          </button>
-          <button
-            className={`nav-btn ${page === 'about' ? 'active' : ''}`}
-            onClick={() => setPage('about')}
-          >
-            About
-          </button>
-        </div>
+        <button
+          className={`nav-btn ${page === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setPage('dashboard')}
+        >
+          Dashboard
+        </button>
+        <button
+          className={`nav-btn ${page === 'about' ? 'active' : ''}`}
+          onClick={() => setPage('about')}
+        >
+          About
+        </button>
       </nav>
 
       {page === 'dashboard' && <Dashboard />}

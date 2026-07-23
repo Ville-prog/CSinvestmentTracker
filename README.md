@@ -4,7 +4,7 @@
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fcsinvestmenttracker.vercel.app)](https://csinvestmenttracker.vercel.app/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Ville-prog/CSinvestmentTracker/blob/main/LICENSE)
 
-A personal CS2 skin investment tracker that records the daily market value of a Steam inventory, charts its returns over time, and compares them against the S&P 500. Essentially a stock portfolio tracker, but for CS2 skins.
+A personal CS2 skin investment tracker that records the monthly market value of a Steam inventory, charts its returns over time, and compares them against the S&P 500. Essentially a stock portfolio tracker, but for CS2 skins.
 
 ## Live App
 
@@ -29,16 +29,16 @@ This app currently only works for a single, hardcoded Steam inventory (mine). Th
 - There is no official API for real-time CS2 market prices
 - Truncated or silently filtered responses. Even within rate limits, Steam will occasionally return a partial snapshot of an inventory with no error signal.
 
-Many third-party tracker sites work around these by running networks of Steam bot accounts that scrape the endpoints continuously, which violates Steam's Terms of Service. This app takes the compliant approach instead: a single nightly job that respects rate limits (one request every 4 seconds) and is designed defensively around truncation and gaps.
+Many third-party tracker sites work around these by running networks of Steam bot accounts that scrape the endpoints continuously, which violates Steam's Terms of Service. This app takes the compliant approach instead: a single monthly job that respects rate limits (one request every 4 seconds) and is designed defensively around truncation and gaps.
 
 ## How it works
 
-A daily job runs at 5 AM UTC (8 AM Finnish time) in two stages:
+A scheduled job runs at **05:00 UTC on the first day of every month** (07:00 Finnish time in winter and 08:00 in summer) in two stages:
 
 1. **Inventory sync:** Fetches the Steam inventory and upserts newly discovered items.
 2. **Price collection:** Fetches current market prices for all tracked items in the database.
 
-Prices are stored daily, building a historical time series. A portfolio snapshot (total value, cost basis, unit count) is recorded at the end of each run. Because pricing is driven by the database rather than the Steam response, transient API gaps don't distort the chart, items still get priced even on days Steam returns a partial inventory.
+Prices are stored during each monthly run, building a monthly historical time series. A portfolio snapshot (total value, cost basis, unit count) is recorded at the end of each run. Because pricing is driven by the database rather than only the latest Steam response, transient API gaps don't distort the chart: tracked items are still priced when Steam returns a partial inventory.
 
 ## P&L calculation
 
@@ -63,7 +63,7 @@ When the tracked quantity of an existing item increases (new units acquired), th
 
 ## Structure
 
-High-level flow: `Steam API → nightly job → PostgreSQL → Spring Boot REST → React on Vercel`.
+High-level flow: `Steam API → monthly collection job → PostgreSQL → Spring Boot REST → React on Vercel`.
 
 ```
 CSinvestmentTracker/
@@ -84,8 +84,8 @@ CSinvestmentTracker/
 
 ## Limitations and future improvements
 
-- **Historical data:** The app only shows data from when tracking began. There is no way to backfill historical portfolio value before the first nightly run, which was on **19.4.2026**.
+- **Historical data:** The app only shows data from when tracking began. There is no way to backfill historical portfolio value before the first collection run, which was on **19.4.2026**. Scheduled data points are now recorded monthly.
 - **Storage Containers:** Steam's inventory API only exposes the base inventory (up to 1000 slots). Items stored inside Storage Containers are not visible to the API and cannot be tracked. Items must be moved to the base inventory to be included.
 - **Trade cooldowns:** Newly traded items have a 7-day market cooldown during which they appear as non-marketable and are skipped by the price collection job.
-- **Single inventory:** The deployed live app currently tracks only one hardcoded Steam inventory. A future improvement could allow multiple Steam IDs to be registered, each with their own nightly price collection and portfolio history, though this would require careful rate limit management across all tracked inventories.
-- **Trade-out detection delay:** Because the app continues to price items that are not in a given Steam response (to absorb API gaps), truly traded-away items are only recognised after 7 consecutive days outside the inventory response.
+- **Single inventory:** The deployed live app currently tracks only one hardcoded Steam inventory. A future improvement could allow multiple Steam IDs to be registered, each with their own monthly price collection and portfolio history, though this would require careful rate limit management across all tracked inventories.
+- **Trade-out detection delay:** Because the app continues to price items missing from a Steam response, a traded-away item is not recognised until a later monthly collection finds that its last-seen date is more than 7 days old.
