@@ -1,20 +1,16 @@
 :root {
-  --cs-gold: #d8c715;
-  --cs-gold-deep: #a8990c;
-  --cs-ink: #231f1c;
-  --chart-bench: #bdb6a5;
-  --chart-grid: #f1f3f6;
-  --chart-hair: #d7dade;     
-  --chart-axis: #9aa0ab;     
-  --chart-pos: #1c7a4d;      
-  --chart-neg: #bb3b2c;      
+  --chart-line: #171715;
+  --chart-bench: #9a9890;
+  --chart-grid: #e5e3dc;
+  --chart-hair: #cfcdc5;
+  --chart-axis: #74736d;
 }
 
 .chart-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
   gap: 8px;
 }
@@ -25,32 +21,28 @@
 }
 
 .range-btn {
-  background: none;
-  border: none;
-  color: #9aa0ab;
-  padding: 5px 10px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  padding: 4px 8px;
   cursor: pointer;
-  font-size: 13px;
-  font-family: inherit;
-  font-weight: 500;
-  border-radius: 4px;
-  transition: color 0.15s, background-color 0.15s;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
 }
 
-.range-btn:hover {
-  color: #555;
-}
+.range-btn:hover { color: var(--ink); }
 
 .range-btn.active {
-  color: var(--cs-gold-deep);
-  font-weight: 700;
-  background-color: rgba(216, 199, 21, 0.14);
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .sp500-btn.active {
-  color: #16181d;
-  background-color: #f1f3f6;
-  font-weight: 600;
+  background: transparent;
+  color: var(--ink);
+  outline: 1px solid var(--ink);
+  outline-offset: -1px;
 }
 
 .chart-summary {
@@ -62,35 +54,33 @@
 }
 
 .chart-summary-stat {
-  font-size: 15px;
-  font-weight: 600;
-  color: #595d66;
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
-.chart-summary-stat.positive { color: var(--chart-pos); }
-.chart-summary-stat.negative { color: var(--chart-neg); }
+.chart-summary-stat.positive { color: var(--positive); }
+.chart-summary-stat.negative { color: var(--negative); }
 
 /* EUR secondary label — matches sign color but de-emphasized */
 .chart-summary-stat.chart-summary-eur {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
 }
 
 /* benchmark stat reads quiet regardless of sign */
 .chart-summary-stat.sp500 {
-  font-size: 13px;
-  font-weight: 500;
-  color: #9aa0ab;
+  color: var(--muted);
+  font-size: 12px;
 }
 .chart-summary-stat.sp500.positive,
-.chart-summary-stat.sp500.negative { color: #9aa0ab; }
+.chart-summary-stat.sp500.negative { color: var(--muted); }
 
 .chart-tip {
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--chart-hair);
   padding: 8px 11px;
-  box-shadow: 0 6px 18px -12px rgba(20, 22, 28, 0.4);
+  font-family: var(--mono);
 }
 
 .chart-tip-date {
@@ -103,24 +93,24 @@
   display: flex;
   gap: 14px;
   font-size: 13px;
-  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
-.chart-tip-cs2 { color: var(--cs-ink); }
+.chart-tip-cs2 { color: var(--ink); }
 .chart-tip-cs2 .dot {
   display: inline-block;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--cs-gold);
+  width: 8px;
+  height: 1px;
+  background: var(--ink);
   margin-right: 6px;
   vertical-align: middle;
 }
-.chart-tip-sp { color: var(--chart-axis); font-weight: 500; }
+.chart-tip-sp { color: var(--chart-axis); }
 
 .status-text {
-  color: #9aa0ab;
-  font-size: 14px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
   padding: 40px 0;
   text-align: center;
 }

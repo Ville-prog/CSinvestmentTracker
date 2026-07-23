@@ -24,13 +24,14 @@ function App() {
       <nav className="top-nav">
         <div className="nav-brand">
           <img src="/cs_logo_ink.png" alt="CS" className="nav-glyph" />
+          <span className="nav-wordmark">Investment tracker</span>
         </div>
         <div className="nav-links">
           <button
             className={`nav-btn ${page === 'dashboard' ? 'active' : ''}`}
             onClick={() => setPage('dashboard')}
           >
-            Dashboard
+            Portfolio
           </button>
           <button
             className={`nav-btn ${page === 'about' ? 'active' : ''}`}

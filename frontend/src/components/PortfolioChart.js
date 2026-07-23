@@ -19,12 +19,11 @@ import './PortfolioChart.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
-const COLOR_LINE = '#231f1c';   // --cs-ink
-const COLOR_GOLD = '#d8c715';   // --cs-gold
-const COLOR_BENCH = '#bdb6a5';  // --chart-bench
-const COLOR_GRID = '#f1f3f6';   // --chart-grid
-const COLOR_HAIR = '#d7dade';   // --chart-hair
-const COLOR_AXIS = '#9aa0ab';   // --chart-axis
+const COLOR_LINE = '#171715';
+const COLOR_BENCH = '#9a9890';
+const COLOR_GRID = '#e5e3dc';
+const COLOR_HAIR = '#cfcdc5';
+const COLOR_AXIS = '#74736d';
 
 const RANGES = [
   { label: 'Max', months: null },
@@ -254,12 +253,6 @@ function PortfolioChart() {
       ) : (
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
-            <defs>
-              <linearGradient id="portfolioGoldWash" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={COLOR_GOLD} stopOpacity={0.28} />
-                <stop offset="100%" stopColor={COLOR_GOLD} stopOpacity={0} />
-              </linearGradient>
-            </defs>
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
@@ -280,7 +273,7 @@ function PortfolioChart() {
             <ReferenceLine y={0} stroke={COLOR_HAIR} />
             <Tooltip
               content={<ChartTooltip />}
-              cursor={{ stroke: COLOR_GOLD, strokeWidth: 1 }}
+              cursor={{ stroke: COLOR_HAIR, strokeWidth: 1 }}
             />
             {showSp500 && (
               <Area
@@ -299,11 +292,11 @@ function PortfolioChart() {
               type="monotone"
               dataKey="portfolio"
               stroke={COLOR_LINE}
-              strokeWidth={1.9}
-              fill="url(#portfolioGoldWash)"
+              strokeWidth={1.5}
+              fill="none"
               baseValue="dataMin"
               dot={false}
-              activeDot={{ r: 4, fill: '#fff', stroke: COLOR_GOLD, strokeWidth: 2.2 }}
+              activeDot={{ r: 3, fill: '#f4f3ef', stroke: COLOR_LINE, strokeWidth: 1.5 }}
               connectNulls
             />
           </AreaChart>

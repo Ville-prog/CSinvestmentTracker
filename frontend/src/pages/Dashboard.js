@@ -76,18 +76,16 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-      <div className="hero-card" style={{ backgroundImage: 'url(/cs_banner.png)' }}>
-        <div className="hero-card-overlay" />
-        <div className="hero-card-text">
-          <span className="hero-card-subtitle">COUNTER-STRIKE 2</span>
-          <span className="hero-card-title">CS2 Portfolio</span>
-        </div>
-      </div>
+      <header className="page-header">
+        <p className="eyebrow">Counter-Strike 2 / Personal inventory</p>
+        <h1>Portfolio</h1>
+        <p className="page-intro">Market value and performance of a single tracked inventory.</p>
+      </header>
 
-      <div className="portfolio-header">
+      <section className="portfolio-header" aria-label="Portfolio summary">
         <div className="portfolio-header-left">
           <div className="portfolio-title">
-            <span className="portfolio-title-label">Portfolio value</span>
+            <span className="portfolio-title-label">Current market value</span>
           </div>
           <div className="portfolio-value-row">
             <span className="portfolio-value">€{latestValue != null ? latestValue.toFixed(2) : '—'}</span>
@@ -127,22 +125,22 @@ function Dashboard() {
             <span className="portfolio-stat-value">€{costBasis.toFixed(1)}</span>
           </div>
         </div>
-      </div>
+      </section>
 
       {snapshot && (
         <>
-          <div className="chart-tabs">
+          <div className="chart-tabs" aria-label="Chart view">
             <button
               className={`chart-tab ${chartView === 'performance' ? 'active' : ''}`}
               onClick={() => setChartView('performance')}
             >
-              P&L %
+              Performance
             </button>
             <button
               className={`chart-tab ${chartView === 'value' ? 'active' : ''}`}
               onClick={() => setChartView('value')}
             >
-              Total Value
+              Market value
             </button>
           </div>
           {chartView === 'performance' ? <PortfolioChart /> : <PortfolioValueChart />}

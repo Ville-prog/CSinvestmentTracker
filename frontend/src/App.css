@@ -1,87 +1,108 @@
-@import url('https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-
 :root {
-  --hairline: #e7e9ed;
-  --ink: #16181d;
-  --muted: #999;
-  --muted-strong: #555;
-  --nav-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --paper: #f4f3ef;
+  --surface: #faf9f6;
+  --ink: #171715;
+  --muted: #74736d;
+  --hairline: #d8d6cf;
+  --positive: #1d6b45;
+  --negative: #a33a2f;
+  --sans: Arial, Helvetica, sans-serif;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
+
+html { background: var(--paper); }
 
 body {
-  background-color: #f5f5f5;
-  color: #1a1a1a;
-  font-family: 'Gentium Book Plus', serif;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
+
+button, input, select { font: inherit; }
 
 .App {
-  max-width: 1100px;
+  width: min(1120px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 32px 16px;
-}
-
-@media (max-width: 640px) {
-  .App { padding: 16px 12px; }
-  .top-nav { margin-bottom: 16px; }
+  padding: 0 0 64px;
 }
 
 .top-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 56px;
-  margin-bottom: 32px;
+  height: 72px;
+  margin-bottom: 56px;
   border-bottom: 1px solid var(--hairline);
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
+  gap: 14px;
 }
 
 .nav-glyph {
   display: block;
-  height: 21px;
+  height: 17px;
   width: auto;
 }
 
-.nav-divider {
-  display: block;
-  width: 1px;
-  height: 20px;
-  background-color: var(--hairline);
-  margin: 0 13px;
-}
-
 .nav-wordmark {
-  font-family: var(--nav-sans);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--ink);
-  letter-spacing: -0.005em;
+  padding-left: 14px;
+  border-left: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 
 .nav-links {
   display: flex;
-  gap: 4px;
+  gap: 24px;
 }
 
 .nav-btn {
-  background: none;
+  position: relative;
+  background: transparent;
   border: none;
   color: var(--muted);
-  font-family: var(--nav-sans);
-  font-size: 14px;
-  font-weight: 500;
-  padding: 4px 8px;
+  padding: 25px 0 24px;
   cursor: pointer;
-  transition: color 0.15s;
 }
-.nav-btn:hover { color: var(--muted-strong); }
+
+.nav-btn:hover { color: var(--ink); }
 .nav-btn.active { color: var(--ink); }
+
+.nav-btn.active::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  background: var(--ink);
+  content: "";
+}
+
+@media (max-width: 640px) {
+  .App {
+    width: min(100% - 28px, 1120px);
+    padding-bottom: 40px;
+  }
+
+  .top-nav {
+    height: 60px;
+    margin-bottom: 36px;
+  }
+
+  .nav-wordmark { display: none; }
+  .nav-links { gap: 18px; }
+  .nav-btn { padding: 19px 0 18px; }
+}
